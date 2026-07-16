@@ -18,23 +18,16 @@ export function Logo({
         className
       )}
     >
-      <span className="relative flex size-8 items-center justify-center rounded-lg bg-brand/15 ring-1 ring-brand/30">
-        <span className="absolute inset-0 rounded-lg bg-brand/20 blur-md" />
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          className="relative size-4 text-brand"
+      <span className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] shadow-sm ring-1 ring-black/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logos/growthmcp.svg"
+          alt=""
+          width={32}
+          height={32}
+          className="size-8"
           aria-hidden
-        >
-          <path
-            d="M4 16.5L9.2 7.8c.4-.7 1.4-.7 1.8 0L14 13l1.3-2.2c.4-.7 1.4-.7 1.8 0L20 16.5"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="18.5" cy="6.5" r="1.6" fill="currentColor" />
-        </svg>
+        />
       </span>
       {showWordmark && (
         <span className="text-[15px] font-semibold tracking-tight">
