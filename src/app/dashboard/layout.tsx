@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isEmailAllowed } from "@/lib/auth/allowlist";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { MobileNav } from "@/components/dashboard/mobile-nav";
 
@@ -15,6 +16,11 @@ export default async function DashboardLayout({
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (!isEmailAllowed(user.email)) {
+    await supabase.auth.signOut();
+    redirect("/login?error=unauthorized");
   }
 
   return (
