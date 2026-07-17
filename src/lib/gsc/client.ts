@@ -16,13 +16,17 @@ export type GscSearchRow = {
   position: number;
 };
 
-export type GscQueryRow = {
-  query: string;
+export type GscDimRow = {
+  key: string;
   clicks: number;
   impressions: number;
   ctr: number;
   position: number;
 };
+
+export type GscQueryRow = GscDimRow;
+export type GscPageRow = GscDimRow;
+export type GscCountryRow = GscDimRow;
 
 export type GscDailyPoint = {
   date: string;
@@ -32,30 +36,59 @@ export type GscDailyPoint = {
   position: number;
 };
 
+export type GscRangeKey = "24h" | "7d" | "28d" | "3m";
+
+export const GSC_RANGE_OPTIONS: {
+  key: GscRangeKey;
+  label: string;
+  days: number;
+}[] = [
+  { key: "24h", label: "24 hours", days: 1 },
+  { key: "7d", label: "7 days", days: 7 },
+  { key: "28d", label: "28 days", days: 28 },
+  { key: "3m", label: "3 months", days: 90 },
+];
+
 export type GscOverviewStats = {
   clicks: number;
   impressions: number;
   ctr: number;
   position: number;
-  topQueries: GscQueryRow[];
+  topQueries: GscDimRow[];
+  topPages: GscDimRow[];
+  topCountries: GscDimRow[];
   daily: GscDailyPoint[];
-  range: { startDate: string; endDate: string };
+  range: { startDate: string; endDate: string; key: GscRangeKey };
+  propertyUri: string;
 };
 
 function encodeSiteUrl(siteUrl: string) {
   return encodeURIComponent(siteUrl);
 }
 
-function isoDate(d: Date) {
-  return d.toISOString().slice(0, 10);
+/** GSC dates are calendar days in America/Los_Angeles (PST/PDT). */
+function gscToday(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
-/** Operator-heavy SEO tool queries — deprioritize in the UI. */
+function addDaysIso(iso: string, days: number): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
+
+/** Operator-heavy SEO tool queries — hide from the table after ranking. */
 function isNoisyQuery(query: string) {
   const q = query.toLowerCase();
   if (q.includes("-site:")) return true;
   if ((q.match(/"/g) ?? []).length >= 4) return true;
-  if (q.length > 80) return true;
+  if (q.length > 100) return true;
   return false;
 }
 
@@ -133,76 +166,144 @@ export async function getValidAccessToken(
   return tokens.access_token;
 }
 
+/**
+ * Resolve a GSC-style preset window ending on the latest day with data (PST).
+ * days=1 → that single latest day ("24 hours" in the UI).
+ */
+async function resolveRange(
+  accessToken: string,
+  propertyUri: string,
+  days: number
+): Promise<{ startDate: string; endDate: string }> {
+  const todayPst = gscToday();
+  const probeEnd = addDaysIso(todayPst, -1);
+  // Probe far enough back to find the newest available day
+  const probeStart = addDaysIso(probeEnd, -Math.max(days + 14, 45));
+
+  const probe = await querySearchAnalytics(accessToken, propertyUri, {
+    startDate: probeStart,
+    endDate: probeEnd,
+    searchType: "web",
+    dataState: "all",
+    dimensions: ["date"],
+    rowLimit: 250,
+  });
+
+  const dates = (probe.rows ?? [])
+    .map((r) => r.keys?.[0])
+    .filter((d): d is string => Boolean(d))
+    .sort();
+
+  const endDate = dates[dates.length - 1] ?? probeEnd;
+  const startDate = addDaysIso(endDate, -(Math.max(days, 1) - 1));
+  return { startDate, endDate };
+}
+
 export async function fetchGscOverview(
   accessToken: string,
-  propertyUri: string
+  propertyUri: string,
+  rangeKey: GscRangeKey = "28d"
 ): Promise<GscOverviewStats> {
-  const end = new Date();
-  end.setUTCDate(end.getUTCDate() - 3); // GSC data lag
-  const start = new Date(end);
-  start.setUTCDate(start.getUTCDate() - 27);
+  const option =
+    GSC_RANGE_OPTIONS.find((o) => o.key === rangeKey) ?? GSC_RANGE_OPTIONS[2];
 
-  const startDate = isoDate(start);
-  const endDate = isoDate(end);
+  const { startDate, endDate } = await resolveRange(
+    accessToken,
+    propertyUri,
+    option.days
+  );
 
-  const [totals, byDate, queries] = await Promise.all([
+  const base = {
+    startDate,
+    endDate,
+    searchType: "web" as const,
+    dataState: "all" as const,
+  };
+
+  const daySpan = option.days;
+
+  const [totals, byDate, queries, pages, countries] = await Promise.all([
     querySearchAnalytics(accessToken, propertyUri, {
-      startDate,
-      endDate,
+      ...base,
       dimensions: [],
       rowLimit: 1,
     }),
     querySearchAnalytics(accessToken, propertyUri, {
-      startDate,
-      endDate,
+      ...base,
       dimensions: ["date"],
-      rowLimit: 32,
+      rowLimit: Math.min(Math.max(daySpan + 5, 32), 250),
     }),
     querySearchAnalytics(accessToken, propertyUri, {
-      startDate,
-      endDate,
+      ...base,
       dimensions: ["query"],
-      rowLimit: 50,
+      rowLimit: 1000,
+      startRow: 0,
+    }),
+    querySearchAnalytics(accessToken, propertyUri, {
+      ...base,
+      dimensions: ["page"],
+      rowLimit: 1000,
+      startRow: 0,
+    }),
+    querySearchAnalytics(accessToken, propertyUri, {
+      ...base,
+      dimensions: ["country"],
+      rowLimit: 250,
+      startRow: 0,
     }),
   ]);
-
-  const total = totals.rows?.[0];
 
   const daily = (byDate.rows ?? [])
     .map((row) => ({
       date: row.keys?.[0] ?? "",
-      clicks: row.clicks,
-      impressions: row.impressions,
-      ctr: row.ctr,
-      position: row.position,
+      clicks: row.clicks ?? 0,
+      impressions: row.impressions ?? 0,
+      ctr: row.ctr ?? 0,
+      position: row.position ?? 0,
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  const mapped = (queries.rows ?? []).map((row) => ({
-    query: row.keys?.[0] ?? "",
-    clicks: row.clicks,
-    impressions: row.impressions,
-    ctr: row.ctr,
-    position: row.position,
-  }));
+  const aggregate = totals.rows?.[0];
+  const summedClicks = daily.reduce((s, d) => s + d.clicks, 0);
+  const summedImpressions = daily.reduce((s, d) => s + d.impressions, 0);
 
-  const clean = mapped
-    .filter((q) => q.query && !isNoisyQuery(q.query))
-    .sort((a, b) => b.clicks - a.clicks || b.impressions - a.impressions);
+  const clicks = aggregate?.clicks ?? summedClicks;
+  const impressions = aggregate?.impressions ?? summedImpressions;
+  const ctr =
+    aggregate?.ctr ?? (impressions > 0 ? clicks / impressions : 0);
+  const position = aggregate?.position ?? 0;
 
-  const fallback = mapped.sort(
-    (a, b) => b.clicks - a.clicks || b.impressions - a.impressions
-  );
-
-  const topQueries = (clean.length >= 5 ? clean : fallback).slice(0, 10);
+  const rankRows = (
+    rows: GscSearchRow[] | undefined,
+    opts?: { filterNoise?: boolean }
+  ): GscDimRow[] =>
+    (rows ?? [])
+      .map((row) => ({
+        key: (row.keys?.[0] ?? "").trim(),
+        clicks: row.clicks ?? 0,
+        impressions: row.impressions ?? 0,
+        ctr: row.ctr ?? 0,
+        position: row.position ?? 0,
+      }))
+      .filter((r) => r.key.length > 0)
+      .sort((a, b) => {
+        if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+        if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+        return a.key.localeCompare(b.key);
+      })
+      .filter((r) => (opts?.filterNoise ? !isNoisyQuery(r.key) : true))
+      .slice(0, 10);
 
   return {
-    clicks: total?.clicks ?? 0,
-    impressions: total?.impressions ?? 0,
-    ctr: total?.ctr ?? 0,
-    position: total?.position ?? 0,
-    topQueries,
+    clicks,
+    impressions,
+    ctr,
+    position,
+    topQueries: rankRows(queries.rows, { filterNoise: true }),
+    topPages: rankRows(pages.rows),
+    topCountries: rankRows(countries.rows),
     daily,
-    range: { startDate, endDate },
+    range: { startDate, endDate, key: option.key },
+    propertyUri,
   };
 }

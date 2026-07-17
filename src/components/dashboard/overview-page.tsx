@@ -40,8 +40,8 @@ export function OverviewPage() {
   const host = currentProject.url.replace(/^https?:\/\//, "");
 
   return (
-    <div className="flex-1 p-6 sm:p-10">
-      <div className="max-w-5xl space-y-10">
+    <div className="flex-1 p-6 sm:p-8 lg:p-10">
+      <div className="w-full space-y-10">
         <header className="space-y-5">
           <div className="flex items-center gap-5 sm:gap-6">
             <ProjectLogo

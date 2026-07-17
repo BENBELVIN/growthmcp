@@ -14,7 +14,12 @@ import {
 } from "recharts";
 import { ArrowUpRight, MousePointerClick, Eye, Percent, Crosshair } from "lucide-react";
 import { getGscOverviewForWebsite } from "@/lib/gsc/actions";
-import type { GscOverviewStats } from "@/lib/gsc/client";
+import {
+  GSC_RANGE_OPTIONS,
+  type GscOverviewStats,
+  type GscRangeKey,
+} from "@/lib/gsc/client";
+import { formatGscCountry, shortPagePath } from "@/lib/gsc/labels";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -115,20 +120,20 @@ function ChartTooltip({
 
 function GscSkeleton() {
   return (
-    <div className="overflow-hidden rounded-3xl border border-border/60 bg-card/40">
-      <div className="border-b border-border/60 px-5 py-4 sm:px-6">
+    <div className="w-full space-y-6">
+      <div>
         <div className="h-5 w-40 animate-pulse rounded bg-muted" />
         <div className="mt-2 h-3 w-56 animate-pulse rounded bg-muted/70" />
       </div>
-      <div className="grid grid-cols-2 border-b border-border/60 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-border/40 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border-border/60 p-5 sm:p-6 lg:border-r lg:last:border-r-0">
+          <div key={i} className="bg-background p-5 sm:p-6">
             <div className="h-3 w-20 animate-pulse rounded bg-muted" />
             <div className="mt-3 h-8 w-16 animate-pulse rounded bg-muted" />
           </div>
         ))}
       </div>
-      <div className="h-64 animate-pulse bg-muted/20" />
+      <div className="h-64 animate-pulse rounded-2xl bg-muted/20" />
     </div>
   );
 }
@@ -138,6 +143,7 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rangeKey, setRangeKey] = useState<GscRangeKey>("28d");
   const [active, setActive] = useState<Record<MetricKey, boolean>>({
     clicks: true,
     impressions: true,
@@ -148,7 +154,7 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    void getGscOverviewForWebsite(websiteId).then((res) => {
+    void getGscOverviewForWebsite(websiteId, rangeKey).then((res) => {
       if (cancelled) return;
       setLoading(false);
       setConnected(res.connected);
@@ -158,23 +164,43 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [websiteId]);
+  }, [websiteId, rangeKey]);
 
   const chartData = useMemo(() => stats?.daily ?? [], [stats]);
 
-  if (loading) return <GscSkeleton />;
+  const rangePicker = (
+    <div className="flex flex-wrap gap-1.5 rounded-full bg-muted/40 p-1 ring-1 ring-border/60">
+      {GSC_RANGE_OPTIONS.map((opt) => (
+        <button
+          key={opt.key}
+          type="button"
+          onClick={() => setRangeKey(opt.key)}
+          className={cn(
+            "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+            rangeKey === opt.key
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (loading && !stats) return <GscSkeleton />;
 
   if (!connected) {
     return (
-      <div className="rounded-3xl border border-dashed border-border/80 bg-card/30 p-8 text-center">
-        <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-muted ring-1 ring-border">
+      <div className="py-8">
+        <div className="flex size-12 items-center justify-center rounded-[22%] bg-muted">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logos/gsc.svg" alt="" className="size-7" />
         </div>
         <h3 className="mt-4 text-lg font-semibold tracking-tight">
           Search Console
         </h3>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+        <p className="mt-2 max-w-md text-sm text-muted-foreground">
           Connect Google Search Console to see clicks, impressions, CTR, and
           ranking queries for this project.
         </p>
@@ -191,23 +217,28 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
     );
   }
 
-  if (error || !stats) {
+  if ((error || !stats) && !loading) {
     return (
-      <div className="rounded-3xl border border-destructive/30 bg-destructive/5 p-6">
-        <h3 className="font-semibold tracking-tight">Search Console</h3>
-        <p className="mt-2 text-sm text-destructive">
+      <div className="space-y-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="font-semibold tracking-tight">Search Console</h3>
+          {rangePicker}
+        </div>
+        <p className="text-sm text-destructive">
           {error ?? "Could not load Search Console data."}
         </p>
       </div>
     );
   }
 
+  if (!stats) return <GscSkeleton />;
+
   return (
-    <div className="overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-b from-card/90 to-card/40 shadow-[0_0_0_1px_rgba(255,255,255,0.03)_inset]">
+    <div className={cn("w-full space-y-8", loading && "opacity-70")}>
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/60 px-5 py-5 sm:px-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-border">
+          <span className="flex size-10 items-center justify-center overflow-hidden rounded-[22%]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logos/gsc.svg" alt="" className="size-6" />
           </span>
@@ -217,17 +248,24 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
             </h3>
             <p className="mt-0.5 text-sm text-muted-foreground">
               {formatRange(stats.range.startDate, stats.range.endDate)}
+              <span className="text-muted-foreground/50"> · </span>
+              <span className="font-mono text-[11px]">
+                {stats.propertyUri}
+              </span>
             </p>
           </div>
         </div>
-        <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-emerald-400 ring-1 ring-emerald-500/20">
-          Live
-        </span>
+        <div className="flex flex-wrap items-center gap-3">
+          {rangePicker}
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-emerald-400 ring-1 ring-emerald-500/20">
+            Live
+          </span>
+        </div>
       </div>
 
       {/* Metric toggles — GSC style */}
-      <div className="grid grid-cols-2 border-b border-border/60 lg:grid-cols-4">
-        {METRICS.map((m, i) => {
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+        {METRICS.map((m) => {
           const Icon = m.icon;
           const on = active[m.key];
           const value =
@@ -247,22 +285,24 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
                 setActive((prev) => ({ ...prev, [m.key]: !prev[m.key] }))
               }
               className={cn(
-                "relative px-5 py-5 text-left transition-colors sm:px-6",
-                i % 2 === 0 && "border-r border-border/60",
-                i < 2 && "border-b border-border/60 lg:border-b-0",
-                i < 3 && "lg:border-r",
-                on ? "bg-white/[0.03]" : "hover:bg-white/[0.02] opacity-70"
+                "relative rounded-2xl px-4 py-4 text-left transition-colors sm:px-5 sm:py-5",
+                on
+                  ? "bg-muted/40 ring-1 ring-border/80"
+                  : "opacity-55 hover:bg-muted/20 hover:opacity-80"
               )}
             >
               <span
-                className="absolute inset-x-0 top-0 h-0.5 transition-opacity"
+                className="absolute inset-x-4 top-0 h-0.5 rounded-full transition-opacity sm:inset-x-5"
                 style={{
                   background: m.color,
                   opacity: on ? 1 : 0,
                 }}
               />
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Icon className="size-3.5" style={{ color: on ? m.color : undefined }} />
+                <Icon
+                  className="size-3.5"
+                  style={{ color: on ? m.color : undefined }}
+                />
                 <span className="text-xs font-medium">{m.label}</span>
               </div>
               <p
@@ -277,12 +317,12 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
       </div>
 
       {/* Chart */}
-      <div className="border-b border-border/60 px-2 py-4 sm:px-4 sm:py-6">
-        <div className="h-64 w-full sm:h-72">
+      <div className="-mx-1 w-full sm:mx-0">
+        <div className="h-72 w-full sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
               data={chartData}
-              margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
             >
               <defs>
                 <linearGradient id="gscClicks" x1="0" y1="0" x2="0" y2="1">
@@ -375,64 +415,135 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
         </div>
       </div>
 
-      {/* Queries table */}
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <div>
-            <h4 className="text-sm font-semibold tracking-tight">Queries</h4>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Top search queries in this period
-            </p>
-          </div>
-        </div>
+      {/* Dimension tables — Queries / Pages / Countries */}
+      <GscDimensionTables stats={stats} />
+    </div>
+  );
+}
 
-        <div className="overflow-x-auto rounded-2xl border border-border/60">
-          <table className="w-full min-w-[520px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-border/60 bg-muted/30 text-xs text-muted-foreground">
-                <th className="px-4 py-3 font-medium">Top queries</th>
-                <th className="px-4 py-3 text-right font-medium">Clicks</th>
-                <th className="px-4 py-3 text-right font-medium">Impr.</th>
-                <th className="px-4 py-3 text-right font-medium">CTR</th>
-                <th className="px-4 py-3 text-right font-medium">Position</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.topQueries.map((q, idx) => (
-                <tr
-                  key={`${q.query}-${idx}`}
-                  className="border-b border-border/40 last:border-0 hover:bg-white/[0.02]"
-                >
-                  <td className="max-w-[220px] truncate px-4 py-3 font-medium text-foreground sm:max-w-none">
-                    {q.query}
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-[#4285F4]">
-                    {new Intl.NumberFormat("en").format(q.clicks)}
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-[#A142F4]">
-                    {new Intl.NumberFormat("en").format(q.impressions)}
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                    {(q.ctr * 100).toFixed(1)}%
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                    {q.position.toFixed(1)}
-                  </td>
-                </tr>
-              ))}
-              {stats.topQueries.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-8 text-center text-muted-foreground"
-                  >
-                    No queries in this period.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+type DimTab = "queries" | "pages" | "countries";
+
+function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
+  const [tab, setTab] = useState<DimTab>("queries");
+
+  const tabs: { id: DimTab; label: string; empty: string; header: string }[] = [
+    {
+      id: "queries",
+      label: "Queries",
+      empty: "No queries in this period.",
+      header: "Top queries",
+    },
+    {
+      id: "pages",
+      label: "Pages",
+      empty: "No pages in this period.",
+      header: "Top pages",
+    },
+    {
+      id: "countries",
+      label: "Countries",
+      empty: "No countries in this period.",
+      header: "Country",
+    },
+  ];
+
+  const rows =
+    tab === "queries"
+      ? stats.topQueries
+      : tab === "pages"
+        ? stats.topPages
+        : stats.topCountries;
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="flex flex-wrap gap-1 rounded-full bg-muted/40 p-1 ring-1 ring-border/60">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
+                  tab === t.id
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {tab === "queries" && "Top search queries in this period"}
+            {tab === "pages" && "Top landing pages in this period"}
+            {tab === "countries" && "Traffic by country in this period"}
+          </p>
         </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[520px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-border/70 text-xs text-muted-foreground">
+              <th className="pb-3 pr-4 font-medium">
+                {tabs.find((t) => t.id === tab)?.header}
+              </th>
+              <th className="pb-3 px-4 text-right font-medium">Clicks</th>
+              <th className="pb-3 px-4 text-right font-medium">Impr.</th>
+              <th className="pb-3 px-4 text-right font-medium">CTR</th>
+              <th className="pb-3 pl-4 text-right font-medium">Position</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, idx) => {
+              const label =
+                tab === "countries"
+                  ? formatGscCountry(row.key)
+                  : tab === "pages"
+                    ? shortPagePath(row.key)
+                    : row.key;
+              const title = tab === "pages" ? row.key : label;
+
+              return (
+                <tr
+                  key={`${tab}-${row.key}-${idx}`}
+                  className="border-b border-border/40 last:border-0"
+                >
+                  <td
+                    className="max-w-[280px] truncate py-3.5 pr-4 font-medium text-foreground sm:max-w-md"
+                    title={title}
+                  >
+                    {label}
+                  </td>
+                  <td className="px-4 py-3.5 text-right tabular-nums text-[#4285F4]">
+                    {new Intl.NumberFormat("en").format(row.clicks)}
+                  </td>
+                  <td className="px-4 py-3.5 text-right tabular-nums text-[#A142F4]">
+                    {new Intl.NumberFormat("en").format(row.impressions)}
+                  </td>
+                  <td className="px-4 py-3.5 text-right tabular-nums text-muted-foreground">
+                    {(row.ctr * 100).toFixed(1)}%
+                  </td>
+                  <td className="py-3.5 pl-4 text-right tabular-nums text-muted-foreground">
+                    {row.position.toFixed(1)}
+                  </td>
+                </tr>
+              );
+            })}
+            {rows.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="py-8 text-center text-muted-foreground"
+                >
+                  {tabs.find((t) => t.id === tab)?.empty}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

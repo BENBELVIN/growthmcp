@@ -10,7 +10,7 @@ import {
 } from "@/lib/gsc/client";
 import { preferWwwProperty } from "@/lib/gsc/properties";
 import { getGscConnectionSecret } from "@/lib/gsc/queries";
-import type { GscOverviewStats } from "@/lib/gsc/client";
+import type { GscOverviewStats, GscRangeKey } from "@/lib/gsc/client";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -92,7 +92,8 @@ export async function disconnectGsc(websiteId: string) {
 }
 
 export async function getGscOverviewForWebsite(
-  websiteId: string
+  websiteId: string,
+  rangeKey: GscRangeKey = "28d"
 ): Promise<{ stats: GscOverviewStats | null; error?: string; connected: boolean }> {
   const { supabase } = await requireUser();
   const connection = await getGscConnectionSecret(websiteId);
@@ -103,7 +104,11 @@ export async function getGscOverviewForWebsite(
 
   try {
     const accessToken = await getValidAccessToken(supabase, connection);
-    const stats = await fetchGscOverview(accessToken, connection.property_uri);
+    const stats = await fetchGscOverview(
+      accessToken,
+      connection.property_uri,
+      rangeKey
+    );
 
     await supabase
       .from("gsc_connections")
