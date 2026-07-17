@@ -47,7 +47,7 @@ export default function DashboardPage() {
           </Button>
           <Button
             variant="outline"
-            className="h-10 rounded-full border-border bg-white/70 px-5"
+            className="h-10 rounded-full border-border bg-muted/60 px-5"
             asChild
           >
             <Link href="/dashboard/mcp">Set up MCP</Link>

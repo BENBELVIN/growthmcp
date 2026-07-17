@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { cn } from "@/lib/utils";
 import { navItems } from "@/lib/data/dashboard";
 
@@ -24,7 +25,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "flex h-screen w-64 shrink-0 flex-col border-r border-border/80 bg-white/70 backdrop-blur-xl",
+        "flex h-screen w-64 shrink-0 flex-col border-r border-border/80 bg-sidebar/80 backdrop-blur-xl",
         className
       )}
     >
@@ -57,6 +58,10 @@ export function DashboardSidebar({ className }: { className?: string }) {
           );
         })}
       </nav>
+
+      <div className="border-t border-border/80 p-3">
+        <SignOutButton />
+      </div>
     </aside>
   );
 }

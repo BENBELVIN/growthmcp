@@ -71,7 +71,7 @@ export default function DocsPage() {
 
         <div className="mt-12">
           <Button className="bg-brand text-brand-foreground hover:bg-brand/90" asChild>
-            <Link href="/dashboard">Open dashboard</Link>
+            <Link href="/login">Open dashboard</Link>
           </Button>
         </div>
       </main>

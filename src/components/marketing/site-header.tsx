@@ -42,13 +42,13 @@ export function SiteHeader() {
             className="h-10 rounded-full border-border bg-white/70 px-5 text-sm font-medium text-foreground hover:bg-white"
             asChild
           >
-            <Link href="/dashboard">Login</Link>
+            <Link href="/login">Login</Link>
           </Button>
           <Button
             className="h-10 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             asChild
           >
-            <Link href="/dashboard">Get Early Access</Link>
+            <Link href="/login">Get Early Access</Link>
           </Button>
         </div>
 
@@ -83,7 +83,7 @@ export function SiteHeader() {
             className="mt-2 h-10 rounded-full bg-primary text-primary-foreground"
             asChild
           >
-            <Link href="/dashboard">Get Early Access</Link>
+            <Link href="/login">Get Early Access</Link>
           </Button>
         </div>
       </div>

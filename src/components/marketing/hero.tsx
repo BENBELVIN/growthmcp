@@ -90,7 +90,7 @@ export function Hero() {
               className="h-12 rounded-full bg-primary px-7 text-[15px] font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90"
               asChild
             >
-              <Link href="/dashboard">
+              <Link href="/login">
                 Get Early Access
                 <ArrowRight className="size-4" />
               </Link>

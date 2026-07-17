@@ -42,7 +42,7 @@ export default function IntegrationsPage() {
               className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex items-start gap-4">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-border">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-muted shadow-sm ring-1 ring-border">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.logo}

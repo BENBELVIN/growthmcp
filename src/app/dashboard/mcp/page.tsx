@@ -38,18 +38,20 @@ export default function McpPage() {
           </ol>
         </BentoCard>
 
-        <BentoCard className="overflow-hidden bg-[#0c0d10]">
-          <div className="flex items-center justify-between border-b border-white/5 px-5 py-3">
-            <span className="font-mono text-xs text-white/50">mcp.json</span>
+        <BentoCard className="overflow-hidden bg-muted/40">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3">
+            <span className="font-mono text-xs text-muted-foreground">
+              mcp.json
+            </span>
             <Button
               size="sm"
               variant="outline"
-              className="h-7 rounded-full border-white/10 bg-white/5 text-xs text-white hover:bg-white/10"
+              className="h-7 rounded-full border-border bg-background/40 text-xs"
             >
               Copy
             </Button>
           </div>
-          <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-white/75">
+          <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed text-muted-foreground">
 {`{
   "mcpServers": {
     "growthmcp": {

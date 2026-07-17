@@ -18,13 +18,13 @@ export function MobileNav() {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full border-border bg-white/70"
+            className="rounded-full border-border bg-muted/60"
           >
             <Menu className="size-4" />
             <span className="sr-only">Open navigation</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="dark w-64 p-0">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <DashboardSidebar className="w-full border-0" />
         </SheetContent>

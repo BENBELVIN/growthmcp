@@ -18,14 +18,14 @@ export function Logo({
         className
       )}
     >
-      <span className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] shadow-sm ring-1 ring-black/5">
+      <span className="relative flex size-8 shrink-0 items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logos/growthmcp.svg"
+          src="/logos/growthmcp.png"
           alt=""
           width={32}
           height={32}
-          className="size-8"
+          className="size-8 object-contain"
           aria-hidden
         />
       </span>
