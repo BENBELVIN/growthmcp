@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Globe,
   LayoutDashboard,
   Plug,
+  Settings,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
@@ -15,8 +17,10 @@ import { navItems } from "@/lib/data/dashboard";
 
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
+  Globe,
   Plug,
   Terminal,
+  Settings,
 };
 
 export function DashboardSidebar({ className }: { className?: string }) {

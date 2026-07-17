@@ -25,6 +25,15 @@ export type WorkspaceMember = {
   created_at: string;
 };
 
+export type Website = {
+  id: string;
+  workspace_id: string;
+  name: string;
+  url: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -84,11 +93,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      websites: {
+        Row: Website;
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          name: string;
+          url: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          name?: string;
+          url?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
       is_workspace_member: {
         Args: { ws_id: string };
+        Returns: boolean;
+      };
+      is_email_allowed: {
+        Args: { check_email: string };
         Returns: boolean;
       };
     };
