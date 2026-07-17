@@ -1,57 +1,56 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import {
-  createWebsite,
-  updateWebsite,
-  type WebsiteActionState,
+  createProject,
+  type ProjectActionState,
 } from "@/lib/websites/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useWorkspace } from "@/components/dashboard/workspace-provider";
 
-const initialState: WebsiteActionState = {};
+const initialState: ProjectActionState = {};
 
-export function WebsiteForm({
-  mode,
-  websiteId,
-  defaultName = "",
-  defaultUrl = "",
+export function AddProjectForm({
+  onSuccess,
+  submitLabel = "Add Project",
 }: {
-  mode: "create" | "edit";
-  websiteId?: string;
-  defaultName?: string;
-  defaultUrl?: string;
+  onSuccess?: () => void;
+  submitLabel?: string;
 }) {
-  const action =
-    mode === "create"
-      ? createWebsite
-      : updateWebsite.bind(null, websiteId!);
+  const { currentWorkspaceId } = useWorkspace();
+  const [state, formAction, pending] = useActionState(
+    createProject,
+    initialState
+  );
 
-  const [state, formAction, pending] = useActionState(action, initialState);
+  useEffect(() => {
+    if (state.projectId) onSuccess?.();
+  }, [state.projectId, onSuccess]);
 
   return (
     <form action={formAction} className="space-y-5">
+      <input type="hidden" name="workspace_id" value={currentWorkspaceId} />
+
       <div className="space-y-2">
-        <Label htmlFor="name">Website Name</Label>
+        <Label htmlFor="project-name">Project Name</Label>
         <Input
-          id="name"
+          id="project-name"
           name="name"
           required
-          defaultValue={defaultName}
           placeholder="GLPPal"
           autoComplete="organization"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="url">Website URL</Label>
+        <Label htmlFor="project-url">URL</Label>
         <Input
-          id="url"
+          id="project-url"
           name="url"
           type="text"
           required
-          defaultValue={defaultUrl}
           placeholder="https://glppal.app"
           autoComplete="url"
           inputMode="url"
@@ -69,13 +68,7 @@ export function WebsiteForm({
         disabled={pending}
         className="h-11 w-full rounded-full bg-primary text-primary-foreground"
       >
-        {pending
-          ? mode === "create"
-            ? "Adding…"
-            : "Saving…"
-          : mode === "create"
-            ? "Add Website"
-            : "Save changes"}
+        {pending ? "Adding…" : submitLabel}
       </Button>
     </form>
   );

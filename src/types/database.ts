@@ -30,6 +30,38 @@ export type Website = {
   workspace_id: string;
   name: string;
   url: string;
+  logo_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GscConnectionStatus = "pending_property" | "connected" | "error";
+
+export type GscConnection = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  connected_by: string;
+  property_uri: string | null;
+  access_token: string;
+  refresh_token: string;
+  token_expires_at: string;
+  status: GscConnectionStatus;
+  last_error: string | null;
+  last_synced_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Safe fields for client UI (no tokens). */
+export type GscConnectionPublic = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  property_uri: string | null;
+  status: GscConnectionStatus;
+  last_error: string | null;
+  last_synced_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -100,6 +132,7 @@ export type Database = {
           workspace_id: string;
           name: string;
           url: string;
+          logo_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -108,6 +141,41 @@ export type Database = {
           workspace_id?: string;
           name?: string;
           url?: string;
+          logo_url?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      gsc_connections: {
+        Row: GscConnection;
+        Insert: {
+          id?: string;
+          website_id: string;
+          workspace_id: string;
+          connected_by: string;
+          property_uri?: string | null;
+          access_token: string;
+          refresh_token: string;
+          token_expires_at: string;
+          status?: GscConnectionStatus;
+          last_error?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          website_id?: string;
+          workspace_id?: string;
+          connected_by?: string;
+          property_uri?: string | null;
+          access_token?: string;
+          refresh_token?: string;
+          token_expires_at?: string;
+          status?: GscConnectionStatus;
+          last_error?: string | null;
+          last_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -123,6 +191,10 @@ export type Database = {
       is_email_allowed: {
         Args: { check_email: string };
         Returns: boolean;
+      };
+      bootstrap_user_account: {
+        Args: Record<string, never>;
+        Returns: Workspace;
       };
     };
     Enums: Record<string, never>;

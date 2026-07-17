@@ -3,21 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Globe,
   LayoutDashboard,
   Plug,
   Settings,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
-import { Logo } from "@/components/shared/logo";
-import { SignOutButton } from "@/components/auth/sign-out-button";
 import { cn } from "@/lib/utils";
 import { navItems } from "@/lib/data/dashboard";
 
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
-  Globe,
   Plug,
   Terminal,
   Settings,
@@ -29,15 +25,11 @@ export function DashboardSidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "flex h-screen w-64 shrink-0 flex-col border-r border-border/80 bg-sidebar/80 backdrop-blur-xl",
+        "flex w-64 shrink-0 flex-col border-r border-border/80 bg-sidebar/50 backdrop-blur-xl",
         className
       )}
     >
-      <div className="flex h-16 items-center px-5">
-        <Logo href="/dashboard" />
-      </div>
-
-      <nav className="flex-1 space-y-1 px-3 pb-4">
+      <nav className="flex-1 space-y-1 px-3 py-4">
         {navItems.map((item) => {
           const Icon = iconMap[item.icon];
           const active =
@@ -62,10 +54,6 @@ export function DashboardSidebar({ className }: { className?: string }) {
           );
         })}
       </nav>
-
-      <div className="border-t border-border/80 p-3">
-        <SignOutButton />
-      </div>
     </aside>
   );
 }
