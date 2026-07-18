@@ -49,14 +49,29 @@ export const GSC_RANGE_OPTIONS: {
   { key: "3m", label: "3 months", days: 90 },
 ];
 
+/** Compact dashboard preview. */
+export const GSC_UI_PREVIEW_LIMIT = 10;
+/** Expanded dashboard table before showing the full agent set. */
+export const GSC_UI_EXPANDED_LIMIT = 25;
+/** Rows kept for MCP / agents (and dashboard “show all”). */
+export const GSC_AGENT_LIMIT = 100;
+
+export type GscDimSort = "clicks" | "impressions" | "opportunity";
+
 export type GscOverviewStats = {
   clicks: number;
   impressions: number;
   ctr: number;
   position: number;
+  /** Ranked by clicks — dashboard + MCP volume view. */
   topQueries: GscDimRow[];
+  /** Ranked by impressions — dashboard + MCP visibility view. */
   topPages: GscDimRow[];
   topCountries: GscDimRow[];
+  /** High impressions / weak CTR — primary MCP action list. */
+  queryOpportunities: GscDimRow[];
+  /** High impressions / weak CTR — primary MCP action list. */
+  pageOpportunities: GscDimRow[];
   daily: GscDailyPoint[];
   range: { startDate: string; endDate: string; key: GscRangeKey };
   propertyUri: string;
@@ -90,6 +105,61 @@ function isNoisyQuery(query: string) {
   if ((q.match(/"/g) ?? []).length >= 4) return true;
   if (q.length > 100) return true;
   return false;
+}
+
+/**
+ * Visibility that isn't converting. Boosts striking-distance positions (4–20)
+ * where title/meta/content tweaks can move the needle.
+ */
+export function opportunityScore(row: Pick<GscDimRow, "impressions" | "ctr" | "position">) {
+  const ctrGap = 1 - Math.min(Math.max(row.ctr, 0), 1);
+  const positionBoost =
+    row.position >= 4 && row.position <= 20
+      ? 1.25
+      : row.position > 20 && row.position <= 40
+        ? 1.1
+        : 1;
+  return row.impressions * ctrGap * positionBoost;
+}
+
+export function rankGscRows(
+  rows: GscSearchRow[] | undefined,
+  opts?: {
+    filterNoise?: boolean;
+    sortBy?: GscDimSort;
+    limit?: number;
+  }
+): GscDimRow[] {
+  const sortBy = opts?.sortBy ?? "clicks";
+  const limit = opts?.limit ?? GSC_AGENT_LIMIT;
+
+  return (rows ?? [])
+    .map((row) => ({
+      key: (row.keys?.[0] ?? "").trim(),
+      clicks: row.clicks ?? 0,
+      impressions: row.impressions ?? 0,
+      ctr: row.ctr ?? 0,
+      position: row.position ?? 0,
+    }))
+    .filter((r) => r.key.length > 0)
+    .sort((a, b) => {
+      if (sortBy === "opportunity") {
+        const diff = opportunityScore(b) - opportunityScore(a);
+        if (diff !== 0) return diff;
+        if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+        return a.key.localeCompare(b.key);
+      }
+      if (sortBy === "impressions") {
+        if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+        if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+      } else {
+        if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+        if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+      }
+      return a.key.localeCompare(b.key);
+    })
+    .filter((r) => (opts?.filterNoise ? !isNoisyQuery(r.key) : true))
+    .slice(0, limit);
 }
 
 export async function listGscSites(accessToken: string): Promise<string[]> {
@@ -273,35 +343,33 @@ export async function fetchGscOverview(
     aggregate?.ctr ?? (impressions > 0 ? clicks / impressions : 0);
   const position = aggregate?.position ?? 0;
 
-  const rankRows = (
-    rows: GscSearchRow[] | undefined,
-    opts?: { filterNoise?: boolean }
-  ): GscDimRow[] =>
-    (rows ?? [])
-      .map((row) => ({
-        key: (row.keys?.[0] ?? "").trim(),
-        clicks: row.clicks ?? 0,
-        impressions: row.impressions ?? 0,
-        ctr: row.ctr ?? 0,
-        position: row.position ?? 0,
-      }))
-      .filter((r) => r.key.length > 0)
-      .sort((a, b) => {
-        if (b.clicks !== a.clicks) return b.clicks - a.clicks;
-        if (b.impressions !== a.impressions) return b.impressions - a.impressions;
-        return a.key.localeCompare(b.key);
-      })
-      .filter((r) => (opts?.filterNoise ? !isNoisyQuery(r.key) : true))
-      .slice(0, 10);
-
   return {
     clicks,
     impressions,
     ctr,
     position,
-    topQueries: rankRows(queries.rows, { filterNoise: true }),
-    topPages: rankRows(pages.rows),
-    topCountries: rankRows(countries.rows),
+    topQueries: rankGscRows(queries.rows, {
+      filterNoise: true,
+      sortBy: "clicks",
+      limit: GSC_AGENT_LIMIT,
+    }),
+    topPages: rankGscRows(pages.rows, {
+      sortBy: "impressions",
+      limit: GSC_AGENT_LIMIT,
+    }),
+    topCountries: rankGscRows(countries.rows, {
+      sortBy: "clicks",
+      limit: GSC_UI_PREVIEW_LIMIT,
+    }),
+    queryOpportunities: rankGscRows(queries.rows, {
+      filterNoise: true,
+      sortBy: "opportunity",
+      limit: GSC_AGENT_LIMIT,
+    }),
+    pageOpportunities: rankGscRows(pages.rows, {
+      sortBy: "opportunity",
+      limit: GSC_AGENT_LIMIT,
+    }),
     daily,
     range: { startDate, endDate, key: option.key },
     propertyUri,

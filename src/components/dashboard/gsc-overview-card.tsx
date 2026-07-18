@@ -16,6 +16,8 @@ import { ArrowUpRight, MousePointerClick, Eye, Percent, Crosshair } from "lucide
 import { getGscOverviewForWebsite } from "@/lib/gsc/actions";
 import {
   GSC_RANGE_OPTIONS,
+  GSC_UI_EXPANDED_LIMIT,
+  GSC_UI_PREVIEW_LIMIT,
   type GscOverviewStats,
   type GscRangeKey,
 } from "@/lib/gsc/client";
@@ -425,6 +427,8 @@ type DimTab = "queries" | "pages" | "countries";
 
 function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
   const [tab, setTab] = useState<DimTab>("queries");
+  /** How many query/page rows to show; countries stay compact. */
+  const [visibleLimit, setVisibleLimit] = useState(GSC_UI_PREVIEW_LIMIT);
 
   const tabs: { id: DimTab; label: string; empty: string; header: string }[] = [
     {
@@ -447,12 +451,28 @@ function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
     },
   ];
 
-  const rows =
+  const allRows =
     tab === "queries"
       ? stats.topQueries
       : tab === "pages"
         ? stats.topPages
         : stats.topCountries;
+
+  const expandable = tab === "queries" || tab === "pages";
+  const rows = expandable ? allRows.slice(0, visibleLimit) : allRows;
+  const remaining = expandable ? Math.max(allRows.length - visibleLimit, 0) : 0;
+
+  const showMore = () => {
+    setVisibleLimit((n) => {
+      if (n <= GSC_UI_PREVIEW_LIMIT) return GSC_UI_EXPANDED_LIMIT;
+      return allRows.length;
+    });
+  };
+
+  const selectTab = (id: DimTab) => {
+    setTab(id);
+    setVisibleLimit(GSC_UI_PREVIEW_LIMIT);
+  };
 
   return (
     <div>
@@ -463,7 +483,7 @@ function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => selectTab(t.id)}
                 className={cn(
                   "rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors",
                   tab === t.id
@@ -476,9 +496,9 @@ function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
             ))}
           </div>
           <p className="mt-2 text-xs text-muted-foreground">
-            {tab === "queries" && "Top search queries in this period"}
-            {tab === "pages" && "Top landing pages in this period"}
-            {tab === "countries" && "Traffic by country in this period"}
+            {tab === "queries" && "Top search queries by clicks"}
+            {tab === "pages" && "Top landing pages by impressions"}
+            {tab === "countries" && "Traffic by country by clicks"}
           </p>
         </div>
       </div>
@@ -545,6 +565,18 @@ function GscDimensionTables({ stats }: { stats: GscOverviewStats }) {
           </tbody>
         </table>
       </div>
+
+      {remaining > 0 && (
+        <div className="mt-4 flex justify-center">
+          <button
+            type="button"
+            onClick={showMore}
+            className="rounded-full px-4 py-1.5 text-xs font-medium text-muted-foreground ring-1 ring-border/70 transition-colors hover:bg-muted/50 hover:text-foreground"
+          >
+            Show more ({remaining} more)
+          </button>
+        </div>
+      )}
     </div>
   );
 }
