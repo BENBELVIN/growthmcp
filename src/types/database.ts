@@ -66,6 +66,38 @@ export type GscConnectionPublic = {
   updated_at: string;
 };
 
+export type TrendDirection = "rising" | "stable" | "falling" | "unknown";
+
+export type TrendOpportunityStatus = "open" | "done" | "dismissed";
+
+export type ProjectTrend = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  keyword: string;
+  interest_score: number;
+  trend_direction: TrendDirection;
+  related_queries: unknown;
+  related_topics: unknown;
+  interest_over_time: unknown;
+  interest_by_region: unknown;
+  region: string | null;
+  last_synced_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TrendOpportunity = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  keyword: string;
+  reason: string;
+  trend_score: number;
+  status: TrendOpportunityStatus;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -178,6 +210,66 @@ export type Database = {
           last_synced_at?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      project_trends: {
+        Row: ProjectTrend;
+        Insert: {
+          id?: string;
+          website_id: string;
+          workspace_id: string;
+          keyword: string;
+          interest_score?: number;
+          trend_direction?: TrendDirection;
+          related_queries?: unknown;
+          related_topics?: unknown;
+          interest_over_time?: unknown;
+          interest_by_region?: unknown;
+          region?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          website_id?: string;
+          workspace_id?: string;
+          keyword?: string;
+          interest_score?: number;
+          trend_direction?: TrendDirection;
+          related_queries?: unknown;
+          related_topics?: unknown;
+          interest_over_time?: unknown;
+          interest_by_region?: unknown;
+          region?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      trend_opportunities: {
+        Row: TrendOpportunity;
+        Insert: {
+          id?: string;
+          website_id: string;
+          workspace_id: string;
+          keyword: string;
+          reason: string;
+          trend_score?: number;
+          status?: TrendOpportunityStatus;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          website_id?: string;
+          workspace_id?: string;
+          keyword?: string;
+          reason?: string;
+          trend_score?: number;
+          status?: TrendOpportunityStatus;
+          created_at?: string;
         };
         Relationships: [];
       };

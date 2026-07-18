@@ -66,18 +66,17 @@ export function Hero() {
             transition={{ duration: 0.6, ease }}
             className="text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl lg:leading-[1.05]"
           >
-            Give Your AI the Context to Grow Your Product
+            The context provider for coding agents
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.08, ease }}
+            transition={{ duration: 0.6, delay: 0.1, ease }}
             className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
           >
-            GrowthMCP connects your search, content and marketing signals through
-            MCP so AI agents can analyse your growth stack and recommend the
-            highest-impact improvements—right inside your editor.
+            Not an SEO tool. GrowthMCP feeds live product signals into Cursor and
+            Claude via MCP—so agents know what to change next, inside your editor.
           </motion.p>
 
           <motion.div
@@ -120,12 +119,13 @@ export function Hero() {
               ))}
             </div>
             <h3 className="mt-6 text-xl font-semibold tracking-tight">
-              Platform
+              Built for
               <br />
-              Agnostic
+              agents
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Give any MCP-compatible agent native access to your growth data.
+              Plug GrowthMCP into Cursor, Claude, or any MCP client—same context,
+              anywhere you code.
             </p>
           </BentoCard>
 
@@ -147,8 +147,8 @@ export function Hero() {
               40%
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Average lift in organic click-through after acting on GrowthMCP
-              recommendations.
+              Less guessing in chat—agents act on live product context instead of
+              generic SEO advice.
             </p>
           </BentoCard>
 
@@ -158,17 +158,17 @@ export function Hero() {
               5×
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              More growth experiments shipped per sprint with AI agents in the
-              loop.
+              Faster loops from signal to shipped change when coding agents have
+              the right context.
             </p>
           </BentoCard>
 
-          {/* Search Console analysis */}
+          {/* Live context tools */}
           <BentoCard delay={0.4} className="flex flex-col p-6 md:col-span-3">
             <h3 className="text-xl font-semibold tracking-tight">
-              Search Console
+              Live context
               <br />
-              Analysis
+              for agents
             </h3>
             <div className="mt-5 overflow-hidden rounded-xl bg-[#0c0d10] p-3 font-mono text-[11px] leading-relaxed text-white/70 shadow-inner">
               <p className="text-emerald-400">→ get_search_console()</p>
@@ -180,14 +180,14 @@ export function Hero() {
             </div>
           </BentoCard>
 
-          {/* AI recommendations illustration */}
+          {/* What agents do with it */}
           <BentoCard delay={0.44} className="p-6 md:col-span-6">
             <h3 className="text-xl font-semibold tracking-tight">
-              AI-Powered Recommendations
+              Context in. Changes out.
             </h3>
             <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Turn raw growth signals into ranked, ready-to-ship tasks your agent
-              can pick up and execute.
+              GrowthMCP ranks the next best actions so your coding agent can open
+              the file, edit the page, and ship—without leaving the IDE.
             </p>
 
             <div className="mt-6 flex items-center gap-3">

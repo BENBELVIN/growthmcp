@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  LineChart,
   Plug,
   Settings,
   Terminal,
@@ -14,6 +15,7 @@ import { navItems } from "@/lib/data/dashboard";
 
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
+  LineChart,
   Plug,
   Terminal,
   Settings,

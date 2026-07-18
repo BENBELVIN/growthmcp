@@ -246,7 +246,7 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
           </span>
           <div>
             <h3 className="text-lg font-semibold tracking-tight">
-              Search Console
+              Performance
             </h3>
             <p className="mt-0.5 text-sm text-muted-foreground">
               {formatRange(stats.range.startDate, stats.range.endDate)}

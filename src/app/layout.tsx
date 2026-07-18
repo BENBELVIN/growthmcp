@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GrowthMCP — Give your AI the context to grow your product",
+    default: "GrowthMCP — The context provider for coding agents",
     template: "%s · GrowthMCP",
   },
   description:
-    "Connect your growth stack through MCP so AI agents can analyse search, content and marketing signals and recommend the highest-impact improvements.",
+    "Not an SEO tool. GrowthMCP feeds live product signals into Cursor and Claude via MCP—so coding agents know what to change next.",
   metadataBase: new URL("https://growthmcp.dev"),
 };
 
