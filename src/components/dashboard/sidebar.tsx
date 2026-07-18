@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  LineChart,
   Plug,
+  Search,
   Settings,
+  Share2,
+  Smartphone,
   Terminal,
   type LucideIcon,
 } from "lucide-react";
@@ -15,7 +17,9 @@ import { navItems } from "@/lib/data/dashboard";
 
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
-  LineChart,
+  Search,
+  Share2,
+  Smartphone,
   Plug,
   Terminal,
   Settings,

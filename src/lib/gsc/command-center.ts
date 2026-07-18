@@ -31,11 +31,33 @@ export type ContentIdea = {
   impressions: number;
 };
 
+export type GrowthChannelId = "seo" | "social" | "app";
+
+export type ChannelOverviewCard = {
+  id: GrowthChannelId;
+  title: string;
+  href: string;
+  connected: boolean;
+  metrics: { label: string; value: string }[];
+  /** Top opportunity or CTA when empty. */
+  highlight: string;
+};
+
+export type RecentWin = {
+  id: string;
+  label: string;
+  detail?: string;
+};
+
 export type CommandCenterData = {
   opportunityScore: OpportunityScore;
   weekSummary: WeekSummaryItem[];
   priorities: PriorityCard[];
   recommendedContent: ContentIdea[];
+  channels: ChannelOverviewCard[];
+  recentWins: RecentWin[];
+  /** Integrations connected for the active project. */
+  connectedIntegrations: string[];
 };
 
 function pctChange(current: number, previous: number): number | null {
@@ -140,10 +162,99 @@ function computeOpportunityScore(
   } else {
     label = "Most obvious opportunities addressed";
     detail =
-      "Fewer easy wins right now — dig into Insights for subtler moves.";
+      "Fewer easy wins right now — dig into SEO for subtler moves.";
   }
 
   return { score, label, detail };
+}
+
+function formatClicksDelta(stats: GscOverviewStats | null): string {
+  if (!stats) return "—";
+  const { recent, prior } = splitDaily(stats);
+  const recentClicks = sumMetric(recent, "clicks");
+  const priorClicks = sumMetric(prior, "clicks");
+  return formatPct(pctChange(recentClicks, priorClicks)) ?? "—";
+}
+
+function buildChannels(
+  stats: GscOverviewStats | null,
+  priorities: PriorityCard[]
+): ChannelOverviewCard[] {
+  const seoPriority = priorities.find(
+    (p) => p.source === "search_console" || p.source === "trends"
+  );
+  const { recent, prior } = stats
+    ? splitDaily(stats)
+    : { recent: [], prior: [] };
+  const impDelta = stats
+    ? formatPct(
+        pctChange(sumMetric(recent, "impressions"), sumMetric(prior, "impressions"))
+      )
+    : null;
+
+  const recentPos = stats ? avgPosition(recent) : 0;
+  const priorPos = stats ? avgPosition(prior) : 0;
+  const posDelta =
+    stats && priorPos > 0 && recentPos > 0 ? priorPos - recentPos : null;
+  const keywordMovement =
+    posDelta === null
+      ? "—"
+      : `${posDelta > 0 ? "↑" : posDelta < 0 ? "↓" : "→"} ${Math.abs(posDelta).toFixed(1)}`;
+
+  return [
+    {
+      id: "seo",
+      title: "SEO",
+      href: "/dashboard/seo",
+      connected: Boolean(stats),
+      metrics: [
+        { label: "Impressions", value: impDelta ?? "—" },
+        { label: "Clicks", value: formatClicksDelta(stats) },
+        { label: "Keyword movement", value: keywordMovement },
+      ],
+      highlight: seoPriority
+        ? seoPriority.label
+        : stats
+          ? "No strong SEO opportunity right now"
+          : "Connect Search Console",
+    },
+    {
+      id: "social",
+      title: "Social",
+      href: "/dashboard/social",
+      connected: false,
+      metrics: [
+        { label: "Best content", value: "—" },
+        { label: "Views growth", value: "—" },
+        { label: "Winning hooks", value: "—" },
+      ],
+      highlight: "Connect TikTok, Instagram, or X",
+    },
+    {
+      id: "app",
+      title: "App",
+      href: "/dashboard/app",
+      connected: false,
+      metrics: [
+        { label: "Downloads", value: "—" },
+        { label: "Ratings", value: "—" },
+        { label: "Revenue", value: "—" },
+      ],
+      highlight: "Connect App Store / RevenueCat",
+    },
+  ];
+}
+
+function buildRecentWins(stats: GscOverviewStats | null): RecentWin[] {
+  const wins: RecentWin[] = [];
+  if (stats) {
+    wins.push({
+      id: "gsc-connected",
+      label: "Connected Google Search Console",
+      detail: "Search signals feeding Overview and SEO",
+    });
+  }
+  return wins;
 }
 
 export function buildCommandCenter(
@@ -157,6 +268,8 @@ export function buildCommandCenter(
   });
 
   if (!stats) {
+    const connectedIntegrations =
+      trendOpportunities.length > 0 ? ["Google Trends"] : [];
     return {
       opportunityScore: computeOpportunityScore(null, priorities),
       weekSummary: [
@@ -188,6 +301,9 @@ export function buildCommandCenter(
       ],
       priorities,
       recommendedContent: [],
+      channels: buildChannels(null, priorities),
+      recentWins: buildRecentWins(null),
+      connectedIntegrations,
     };
   }
 
@@ -276,5 +392,11 @@ export function buildCommandCenter(
     weekSummary,
     priorities,
     recommendedContent,
+    channels: buildChannels(stats, priorities),
+    recentWins: buildRecentWins(stats),
+    connectedIntegrations: [
+      "Google Search Console",
+      ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
+    ],
   };
 }

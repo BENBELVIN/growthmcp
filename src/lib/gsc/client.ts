@@ -201,8 +201,19 @@ export async function querySearchAnalytics(
   return (await res.json()) as { rows?: GscSearchRow[] };
 }
 
+type SupabaseLike = {
+  from: (table: string) => {
+    update: (values: Record<string, unknown>) => {
+      eq: (
+        column: string,
+        value: string
+      ) => PromiseLike<{ error: { message: string } | null }>;
+    };
+  };
+};
+
 export async function getValidAccessToken(
-  supabase: Supabase,
+  supabase: SupabaseLike,
   connection: {
     id: string;
     access_token: string;

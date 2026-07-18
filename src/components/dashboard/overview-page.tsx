@@ -32,7 +32,11 @@ function impactVariant(impact: PriorityCard["impact"]) {
   return "outline" as const;
 }
 
-function sourceLabel(source: PriorityCard["source"]) {
+function channelLabel(source: PriorityCard["source"]) {
+  return "SEO";
+}
+
+function sourceDetail(source: PriorityCard["source"]) {
   return source === "trends" ? "Trends" : "Search Console";
 }
 
@@ -40,9 +44,9 @@ function OverviewSkeleton() {
   return (
     <div className="space-y-8">
       <div className="h-24 animate-pulse rounded-2xl bg-muted/30" />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-24 animate-pulse rounded-2xl bg-muted/20" />
+      <div className="grid gap-3 sm:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="h-40 animate-pulse rounded-2xl bg-muted/20" />
         ))}
       </div>
       <div className="h-48 animate-pulse rounded-2xl bg-muted/20" />
@@ -92,13 +96,13 @@ export function OverviewPage() {
 
   if (!currentProject) {
     return (
-      <div className="flex-1 p-6 sm:p-10">
-        <div className="max-w-2xl space-y-5">
+      <div className="flex-1 p-6 sm:p-8 lg:p-10">
+        <div className="mx-auto w-full max-w-6xl space-y-5">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Hey, {firstName}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Add a project to see what to work on today.
+            Add a project to see what is happening across growth channels.
           </p>
           <Button
             type="button"
@@ -116,16 +120,19 @@ export function OverviewPage() {
   return (
     <div className="flex-1 p-6 sm:p-8 lg:p-10">
       <div className="mx-auto w-full max-w-6xl space-y-10">
-        {/* Greeting + project */}
-        <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-          <div className="min-w-0">
-            <p className="text-sm text-muted-foreground">Hey, {firstName}</p>
-            <h2 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-              What should you work on today?
-            </h2>
-          </div>
+        <header className="space-y-2">
+          <p className="text-sm text-muted-foreground">Hey, {firstName}</p>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            What is happening across your project?
+          </h2>
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+            Cross-channel signals and what to do next — not a raw analytics dump.
+          </p>
+        </header>
 
-          <div className="flex shrink-0 items-center gap-4 sm:gap-5">
+        {/* Project summary */}
+        <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="flex items-center gap-4 rounded-2xl border border-border/70 p-5 sm:gap-5 sm:p-6">
             <ProjectLogo
               name={currentProject.name}
               url={currentProject.url}
@@ -135,7 +142,7 @@ export function OverviewPage() {
             />
             <div className="min-w-0">
               <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-                Current project
+                Active project
               </p>
               <h3 className="mt-1 truncate text-xl font-semibold tracking-tight sm:text-2xl">
                 {currentProject.name}
@@ -145,7 +152,57 @@ export function OverviewPage() {
               </p>
             </div>
           </div>
-        </header>
+
+          <div className="rounded-2xl border border-border/70 p-5 sm:p-6">
+            <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+              Connected integrations
+            </p>
+            {loading ? (
+              <div className="mt-4 h-8 animate-pulse rounded-lg bg-muted/30" />
+            ) : command && command.connectedIntegrations.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {command.connectedIntegrations.map((name) => (
+                  <Badge key={name} variant="secondary" className="font-normal">
+                    {name}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">
+                None yet —{" "}
+                <Link
+                  href="/dashboard/integrations"
+                  className="text-foreground underline-offset-4 hover:underline"
+                >
+                  connect a channel
+                </Link>
+              </p>
+            )}
+            <div className="mt-5 border-t border-border/50 pt-4">
+              <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                Growth health
+              </p>
+              {loading ? (
+                <div className="mt-3 h-8 animate-pulse rounded-lg bg-muted/30" />
+              ) : command ? (
+                <p className="mt-2 text-sm text-foreground">
+                  Opportunity score{" "}
+                  <span className="font-semibold tabular-nums">
+                    {command.opportunityScore.score}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    · {command.opportunityScore.label}
+                  </span>
+                </p>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Placeholder until more channels are connected
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
 
         {loading && <OverviewSkeleton />}
 
@@ -155,17 +212,16 @@ export function OverviewPage() {
               <Sparkles className="size-4 text-muted-foreground" />
             </div>
             <h3 className="mt-4 text-lg font-semibold tracking-tight">
-              Connect Search Console to unlock priorities
+              Connect a growth channel to unlock Overview
             </h3>
             <p className="mt-2 max-w-lg text-sm text-muted-foreground">
-              Overview turns live search data into a short list of actions.
-              Connect GSC for this project to see opportunity score, weekly
-              shifts, and what to fix next.
+              Overview combines SEO, Social, and App signals into what to work
+              on next. Start with Search Console for this project.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button className="h-9 rounded-full" asChild>
                 <Link href="/dashboard/integrations">
-                  Connect Search Console
+                  Open Integrations
                   <ArrowUpRight className="size-4" />
                 </Link>
               </Button>
@@ -174,7 +230,7 @@ export function OverviewPage() {
                 className="h-9 rounded-full border-border"
                 asChild
               >
-                <Link href="/dashboard/insights">Browse Insights</Link>
+                <Link href="/dashboard/seo">Browse SEO</Link>
               </Button>
             </div>
           </section>
@@ -186,71 +242,101 @@ export function OverviewPage() {
 
         {!loading && connected && command && (
           <>
-            {/* Opportunity score */}
-            <section className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)]">
-              <div className="rounded-2xl border border-border/70 bg-gradient-to-b from-muted/30 to-transparent p-6 sm:p-7">
-                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  Opportunity score
-                </p>
-                <div className="mt-4 flex items-end gap-3">
-                  <span className="text-5xl font-semibold tracking-tight tabular-nums sm:text-6xl">
-                    {command.opportunityScore.score}
-                  </span>
-                  <span className="mb-2 text-sm text-muted-foreground">/ 100</span>
-                </div>
-                <p className="mt-3 text-sm font-medium text-foreground">
-                  {command.opportunityScore.label}
-                </p>
-                <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                  {command.opportunityScore.detail}
+            {/* Growth overview cards */}
+            <section className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Growth overview
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Channel snapshots — open a channel for full detail
                 </p>
               </div>
-
-              <div className="rounded-2xl border border-border/70 p-6 sm:p-7">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                    This week
-                  </p>
+              <div className="grid gap-4 lg:grid-cols-3">
+                {command.channels.map((channel) => (
                   <Link
-                    href="/dashboard/insights"
-                    className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                    key={channel.id}
+                    href={channel.href}
+                    className="group flex flex-col rounded-2xl border border-border/70 p-5 transition-colors hover:border-border sm:p-6"
                   >
-                    View Insights
-                  </Link>
-                </div>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {command.weekSummary.map((item) => (
-                    <div key={item.id} className="min-w-0">
-                      <p className="text-xs text-muted-foreground">{item.label}</p>
-                      <p
-                        className={cn(
-                          "mt-1.5 text-xl font-semibold tracking-tight tabular-nums",
-                          toneClass(item.tone)
-                        )}
+                    <div className="flex items-center justify-between gap-2">
+                      <h4 className="font-semibold tracking-tight">
+                        {channel.title}
+                      </h4>
+                      <Badge
+                        variant={channel.connected ? "secondary" : "outline"}
+                        className="h-5 font-normal"
                       >
-                        {item.value}
-                      </p>
-                      {item.delta && (
-                        <p className="mt-1 truncate text-xs text-muted-foreground">
-                          {item.delta}
-                        </p>
-                      )}
+                        {channel.connected ? "Live" : "Soon"}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
+                    <dl className="mt-4 space-y-2">
+                      {channel.metrics.map((m) => (
+                        <div
+                          key={m.label}
+                          className="flex items-baseline justify-between gap-3"
+                        >
+                          <dt className="text-xs text-muted-foreground">
+                            {m.label}
+                          </dt>
+                          <dd className="text-sm font-medium tabular-nums">
+                            {m.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className="mt-4 border-t border-border/50 pt-3 text-xs leading-relaxed text-muted-foreground group-hover:text-foreground/80">
+                      {channel.highlight}
+                    </p>
+                  </Link>
+                ))}
               </div>
             </section>
 
-            {/* Top priorities — unified GSC + Trends queue for MCP/Cursor */}
+            {/* This week (SEO-backed until other channels live) */}
+            <section className="rounded-2xl border border-border/70 p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                  This week
+                </p>
+                <Link
+                  href="/dashboard/seo"
+                  className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  View SEO
+                </Link>
+              </div>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {command.weekSummary.map((item) => (
+                  <div key={item.id} className="min-w-0">
+                    <p className="text-xs text-muted-foreground">{item.label}</p>
+                    <p
+                      className={cn(
+                        "mt-1.5 text-xl font-semibold tracking-tight tabular-nums",
+                        toneClass(item.tone)
+                      )}
+                    >
+                      {item.value}
+                    </p>
+                    {item.delta && (
+                      <p className="mt-1 truncate text-xs text-muted-foreground">
+                        {item.delta}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Top growth opportunities */}
             <section className="space-y-4">
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <h3 className="text-lg font-semibold tracking-tight">
-                    Top priorities
+                    Top growth opportunities
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Ranked queue from Search Console + Trends — what Cursor
-                    should implement next via MCP
+                    Ranked across channels — what Cursor should implement via MCP
                   </p>
                 </div>
               </div>
@@ -278,16 +364,16 @@ export function OverviewPage() {
                             {item.impact} impact
                           </Badge>
                           <Badge variant="outline" className="h-5 font-normal">
-                            {sourceLabel(item.source)}
+                            {channelLabel(item.source)}
                           </Badge>
-                          {item.kind === "keyword" && (
-                            <Badge variant="secondary" className="h-5 font-normal">
-                              Keyword
-                            </Badge>
-                          )}
+                          <Badge variant="secondary" className="h-5 font-normal">
+                            {sourceDetail(item.source)}
+                          </Badge>
                         </div>
                         <h4 className="truncate font-medium tracking-tight">
-                          {item.label}
+                          {item.kind === "page"
+                            ? `Improve ${item.label}`
+                            : item.label}
                         </h4>
                         <p className="text-sm text-foreground/90">
                           {item.opportunity}
@@ -310,64 +396,71 @@ export function OverviewPage() {
                   ))}
                 </div>
               )}
+
+              {/* Placeholder social/app opportunities */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-dashed border-border/60 px-5 py-4">
+                  <Badge variant="outline" className="h-5 font-normal">
+                    Social
+                  </Badge>
+                  <p className="mt-2 text-sm font-medium">
+                    Create more videos using winning hook patterns
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Available once TikTok / Instagram is connected
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-dashed border-border/60 px-5 py-4">
+                  <Badge variant="outline" className="h-5 font-normal">
+                    App
+                  </Badge>
+                  <p className="mt-2 text-sm font-medium">
+                    Improve App Store conversion
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Available once App Store Connect is connected
+                  </p>
+                </div>
+              </div>
             </section>
 
-            {/* Recommended content + completed */}
-            <section className="grid gap-6 lg:grid-cols-2">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    Recommended content
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Queries with demand but weak coverage
-                  </p>
-                </div>
-                {command.recommendedContent.length === 0 ? (
-                  <p className="rounded-2xl border border-border/60 px-5 py-8 text-sm text-muted-foreground">
-                    No content gaps surfaced yet.
-                  </p>
-                ) : (
-                  <ul className="divide-y divide-border/50 rounded-2xl border border-border/70">
-                    {command.recommendedContent.map((idea) => (
-                      <li key={idea.id} className="px-5 py-4">
-                        <p className="text-sm font-medium tracking-tight">
-                          {idea.title}
-                        </p>
-                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                          {idea.reason}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+            {/* Recent wins */}
+            <section className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Recent wins
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Milestones and shipped actions for this project
+                </p>
               </div>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold tracking-tight">
-                    Recently completed
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Actions you&apos;ve shipped from GrowthMCP
-                  </p>
-                </div>
-                <div className="flex min-h-[180px] flex-col items-start justify-center rounded-2xl border border-dashed border-border/70 px-5 py-8">
+              {command.recentWins.length === 0 ? (
+                <div className="flex min-h-[140px] flex-col items-start justify-center rounded-2xl border border-dashed border-border/70 px-5 py-8">
                   <CheckCircle2 className="size-5 text-muted-foreground/70" />
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Completed actions will appear here once you start shipping
-                    from Cursor via MCP.
+                    Wins appear here as you connect channels and ship from
+                    Cursor.
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-5 h-8 rounded-full"
-                    asChild
-                  >
-                    <Link href="/dashboard/mcp">Set up MCP</Link>
-                  </Button>
                 </div>
-              </div>
+              ) : (
+                <ul className="divide-y divide-border/50 rounded-2xl border border-border/70">
+                  {command.recentWins.map((win) => (
+                    <li key={win.id} className="flex items-start gap-3 px-5 py-4">
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                      <div>
+                        <p className="text-sm font-medium tracking-tight">
+                          {win.label}
+                        </p>
+                        {win.detail && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {win.detail}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           </>
         )}

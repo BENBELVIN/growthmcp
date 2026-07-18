@@ -12,19 +12,28 @@ export const integrations = [
 
 export const mcpTools = [
   {
-    name: "get_growth_tasks",
-    description: "Prioritized growth actions ranked by expected impact.",
+    name: "get_growth_priorities",
+    description:
+      "Source of truth — unified Top priorities for Cursor to implement.",
+  },
+  {
+    name: "get_project_context",
+    description: "Opportunity score, week summary, and priorities preview.",
   },
   {
     name: "get_search_console",
-    description: "Queries, pages, CTR, and position changes from GSC.",
+    description: "GSC totals, top queries/pages, and opportunity rows.",
   },
   {
-    name: "get_keyword_opportunities",
-    description: "High-intent keywords you're close to ranking for.",
+    name: "get_trend_opportunities",
+    description: "Open Trends / demand opportunities for the project.",
   },
   {
-    name: "get_trending_topics",
-    description: "Rising topics across Trends and social signals.",
+    name: "get_recommended_content",
+    description: "Content ideas with demand but weak coverage.",
+  },
+  {
+    name: "list_projects",
+    description: "List GrowthMCP projects available to this connection.",
   },
 ] as const;

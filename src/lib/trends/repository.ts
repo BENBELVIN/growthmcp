@@ -1,4 +1,5 @@
-import type { createClient } from "@/lib/supabase/server";
+import type { createClient as createServerClient } from "@/lib/supabase/server";
+import type { createAdminClient } from "@/lib/supabase/admin";
 import type {
   InterestOverTimePoint,
   KeywordTrendsBundle,
@@ -13,7 +14,9 @@ import type {
   TrendOpportunityStatus,
 } from "@/types/database";
 
-type Supabase = Awaited<ReturnType<typeof createClient>>;
+type Supabase =
+  | Awaited<ReturnType<typeof createServerClient>>
+  | ReturnType<typeof createAdminClient>;
 
 export async function listProjectTrends(
   supabase: Supabase,

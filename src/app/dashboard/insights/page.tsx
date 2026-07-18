@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { InsightsPage } from "@/components/dashboard/insights-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Insights",
-};
-
-export default function InsightsRoute() {
-  return <InsightsPage />;
+/** Legacy Insights route — SEO is now a first-class channel. */
+export default function InsightsRedirect() {
+  redirect("/dashboard/seo");
 }

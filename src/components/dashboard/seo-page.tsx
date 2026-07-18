@@ -6,16 +6,16 @@ import { useWorkspace } from "@/components/dashboard/workspace-provider";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function InsightsPage() {
+export function SeoPage() {
   const { currentProject, setAddProjectOpen } = useWorkspace();
 
   if (!currentProject) {
     return (
-      <div className="flex-1 p-6 sm:p-10">
-        <div className="max-w-lg space-y-4">
-          <h2 className="text-2xl font-semibold tracking-tight">Insights</h2>
+      <div className="flex-1 p-6 sm:p-8 lg:p-10">
+        <div className="mx-auto w-full max-w-6xl space-y-4">
+          <h2 className="text-2xl font-semibold tracking-tight">SEO</h2>
           <p className="text-muted-foreground">
-            Select a project to explore Search Console and Trends data.
+            Select a project to explore Search Console and Trends signals.
           </p>
           <Button
             type="button"
@@ -34,10 +34,10 @@ export function InsightsPage() {
       <div className="mx-auto w-full max-w-6xl space-y-8">
         <header className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Insights
+            SEO
           </h2>
           <p className="text-sm text-muted-foreground sm:text-base">
-            Analytics for{" "}
+            Search growth signals for{" "}
             <span className="text-foreground">{currentProject.name}</span>
           </p>
         </header>
@@ -51,13 +51,20 @@ export function InsightsPage() {
               value="search-console"
               className="rounded-none px-4 py-2.5 text-sm data-active:bg-transparent"
             >
-              Search Console
+              Google Search Console
             </TabsTrigger>
             <TabsTrigger
               value="google-trends"
               className="rounded-none px-4 py-2.5 text-sm data-active:bg-transparent"
             >
               Google Trends
+            </TabsTrigger>
+            <TabsTrigger
+              value="aeo"
+              disabled
+              className="rounded-none px-4 py-2.5 text-sm data-active:bg-transparent"
+            >
+              AEO / AI search
             </TabsTrigger>
           </TabsList>
 
