@@ -70,7 +70,7 @@ export function SocialPage() {
             </p>
           </div>
           <Button variant="outline" className="h-9 rounded-full" asChild>
-            <Link href="/dashboard/integrations">
+            <Link href="/dashboard/engine/integrations">
               Manage integrations
               <ArrowUpRight className="size-3.5" />
             </Link>

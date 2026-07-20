@@ -33,11 +33,16 @@ function impactVariant(impact: PriorityCard["impact"]) {
 }
 
 function channelLabel(source: PriorityCard["source"]) {
-  return "SEO";
+  if (source === "trends") return "Demand";
+  return "Supply";
 }
 
 function sourceDetail(source: PriorityCard["source"]) {
-  return source === "trends" ? "Trends" : "Search Console";
+  return source === "trends"
+    ? "Trends"
+    : source === "bing"
+      ? "Bing"
+      : "Search Console";
 }
 
 function OverviewSkeleton() {
@@ -171,7 +176,7 @@ export function OverviewPage() {
               <p className="mt-3 text-sm text-muted-foreground">
                 None yet —{" "}
                 <Link
-                  href="/dashboard/integrations"
+                  href="/dashboard/engine/integrations"
                   className="text-foreground underline-offset-4 hover:underline"
                 >
                   connect a channel
@@ -215,12 +220,12 @@ export function OverviewPage() {
               Connect a growth channel to unlock Overview
             </h3>
             <p className="mt-2 max-w-lg text-sm text-muted-foreground">
-              Overview combines SEO, Social, and App signals into what to work
-              on next. Start with Search Console for this project.
+              Overview combines Demand, Supply, and Convert signals into what to
+              work on next. Start with Search Console for this project.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button className="h-9 rounded-full" asChild>
-                <Link href="/dashboard/integrations">
+                <Link href="/dashboard/engine/integrations">
                   Open Integrations
                   <ArrowUpRight className="size-4" />
                 </Link>
@@ -230,7 +235,7 @@ export function OverviewPage() {
                 className="h-9 rounded-full border-border"
                 asChild
               >
-                <Link href="/dashboard/seo">Browse SEO</Link>
+                <Link href="/dashboard/supply">Browse Supply</Link>
               </Button>
             </div>
           </section>
@@ -249,7 +254,7 @@ export function OverviewPage() {
                   Growth overview
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Channel snapshots — open a channel for full detail
+                  Funnel layer snapshots — open a layer for full detail
                 </p>
               </div>
               <div className="grid gap-4 lg:grid-cols-3">
@@ -300,10 +305,10 @@ export function OverviewPage() {
                   This week
                 </p>
                 <Link
-                  href="/dashboard/seo"
+                  href="/dashboard/supply"
                   className="text-xs text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  View SEO
+                  View Supply
                 </Link>
               </div>
               <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -387,7 +392,7 @@ export function OverviewPage() {
                         className="h-9 shrink-0 rounded-full"
                         asChild
                       >
-                        <Link href="/dashboard/mcp">
+                        <Link href="/dashboard/engine/mcp">
                           Work in Cursor
                           <ArrowRight className="size-3.5" />
                         </Link>
@@ -401,7 +406,7 @@ export function OverviewPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-dashed border-border/60 px-5 py-4">
                   <Badge variant="outline" className="h-5 font-normal">
-                    Social
+                    Supply
                   </Badge>
                   <p className="mt-2 text-sm font-medium">
                     Create more videos using winning hook patterns
@@ -412,7 +417,7 @@ export function OverviewPage() {
                 </div>
                 <div className="rounded-2xl border border-dashed border-border/60 px-5 py-4">
                   <Badge variant="outline" className="h-5 font-normal">
-                    App
+                    Convert
                   </Badge>
                   <p className="mt-2 text-sm font-medium">
                     Improve App Store conversion

@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { SocialPage } from "@/components/dashboard/social-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Social",
-};
-
-export default function SocialRoute() {
-  return <SocialPage />;
+/** Legacy Social route — publishing under Supply; listening under Demand. */
+export default function SocialRedirect() {
+  redirect("/dashboard/supply");
 }

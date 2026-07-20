@@ -10,17 +10,17 @@ import { cn } from "@/lib/utils";
 const CONTEXTS = [
   {
     id: "seo",
-    label: "SEO",
-    detail: "Search Console + Trends — live",
+    label: "Demand",
+    detail: "Trends + keyword intent — live",
   },
   {
     id: "social",
-    label: "Social",
-    detail: "TikTok, Instagram, X — soon",
+    label: "Supply",
+    detail: "Search Console, Bing, publishing — live / soon",
   },
   {
     id: "app",
-    label: "App",
+    label: "Convert",
     detail: "App Store, RevenueCat, PostHog — soon",
   },
 ] as const;
@@ -40,17 +40,17 @@ const TOOLS = [
   },
   {
     name: "get_seo_insights",
-    description: "Search Console + Trends evidence for the SEO channel.",
+    description: "Search Console + Bing + Trends evidence for Demand / Supply.",
     primary: false,
   },
   {
     name: "get_social_insights",
-    description: "Social performance and hooks (placeholder until connected).",
+    description: "Supply-layer social performance and hooks (placeholder).",
     primary: false,
   },
   {
     name: "get_app_metrics",
-    description: "Downloads, revenue, reviews (placeholder until connected).",
+    description: "Convert-layer downloads, revenue, reviews (placeholder).",
     primary: false,
   },
   {
@@ -116,8 +116,8 @@ export function McpSetupPage({ repoPath }: { repoPath: string }) {
                 Connect to Cursor
               </h2>
               <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-                MCP is the AI context layer — Cursor pulls SEO, Social, and App
-                signals for the active project.
+                MCP is the AI context layer — Cursor pulls Demand, Supply, and
+                Convert signals for the active project.
               </p>
             </div>
           </div>
@@ -209,9 +209,9 @@ export function McpSetupPage({ repoPath }: { repoPath: string }) {
               for what to ship — same queue as Overview.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <Badge>SEO</Badge>
-              <Badge variant="secondary">Social</Badge>
-              <Badge variant="outline">App</Badge>
+              <Badge>Demand</Badge>
+              <Badge variant="secondary">Supply</Badge>
+              <Badge variant="outline">Convert</Badge>
             </div>
           </div>
         </section>

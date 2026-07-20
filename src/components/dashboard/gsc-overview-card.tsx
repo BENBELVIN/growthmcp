@@ -210,7 +210,7 @@ export function GscOverviewCard({ websiteId }: { websiteId: string }) {
           asChild
           className="mt-5 h-10 rounded-full bg-primary px-5 text-primary-foreground"
         >
-          <Link href="/dashboard/integrations">
+          <Link href="/dashboard/engine/integrations">
             Connect Search Console
             <ArrowUpRight className="size-4" />
           </Link>

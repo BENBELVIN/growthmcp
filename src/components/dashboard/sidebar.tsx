@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Blocks,
   LayoutDashboard,
-  Plug,
-  Search,
+  Megaphone,
+  Radar,
   Settings,
-  Share2,
-  Smartphone,
-  Terminal,
+  Target,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,11 +16,10 @@ import { navItems } from "@/lib/data/dashboard";
 
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
-  Search,
-  Share2,
-  Smartphone,
-  Plug,
-  Terminal,
+  Radar,
+  Megaphone,
+  Target,
+  Blocks,
   Settings,
 };
 

@@ -8,15 +8,23 @@ import { useWorkspace } from "@/components/dashboard/workspace-provider";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { disconnectGsc } from "@/lib/gsc/actions";
-import type { GscConnectionPublic } from "@/types/database";
+import { disconnectBing } from "@/lib/bing/actions";
+import { enginePaths } from "@/lib/data/dashboard";
+import type {
+  BingConnectionPublic,
+  GscConnectionPublic,
+} from "@/types/database";
 
 type IntegrationId =
   | "gsc"
+  | "bing"
   | "trends"
   | "tiktok"
   | "instagram"
   | "x"
+  | "linkedin"
   | "asc"
+  | "play"
   | "revenuecat"
   | "posthog";
 
@@ -30,15 +38,30 @@ type IntegrationDef = {
 };
 
 type Category = {
-  id: "seo" | "social" | "app";
+  id: "demand" | "supply" | "convert";
   title: string;
   items: IntegrationDef[];
 };
 
 const categories: Category[] = [
   {
-    id: "seo",
-    title: "SEO",
+    id: "demand",
+    title: "Demand Layer",
+    items: [
+      {
+        id: "trends",
+        name: "Google Trends",
+        description:
+          "Rising topics and demand signals synced into growth opportunities.",
+        logo: "/logos/trends.png",
+        badge: null,
+        live: true,
+      },
+    ],
+  },
+  {
+    id: "supply",
+    title: "Supply Layer",
     items: [
       {
         id: "gsc",
@@ -50,20 +73,14 @@ const categories: Category[] = [
         live: true,
       },
       {
-        id: "trends",
-        name: "Google Trends",
+        id: "bing",
+        name: "Bing Webmaster",
         description:
-          "Rising topics and demand signals synced into SEO opportunities.",
-        logo: "/logos/trends.png",
+          "Bing clicks, impressions, and early ranking signals for this project.",
+        logo: "/logos/bing.svg",
         badge: null,
         live: true,
       },
-    ],
-  },
-  {
-    id: "social",
-    title: "Social",
-    items: [
       {
         id: "tiktok",
         name: "TikTok",
@@ -85,11 +102,18 @@ const categories: Category[] = [
         logo: "/logos/x.svg",
         badge: null,
       },
+      {
+        id: "linkedin",
+        name: "LinkedIn",
+        description: "Professional publishing and tracking for this project.",
+        logo: null,
+        badge: "IN",
+      },
     ],
   },
   {
-    id: "app",
-    title: "App",
+    id: "convert",
+    title: "Convert Layer",
     items: [
       {
         id: "asc",
@@ -97,6 +121,13 @@ const categories: Category[] = [
         description: "Downloads, ratings, and listing conversion.",
         logo: "/logos/app-store.svg",
         badge: null,
+      },
+      {
+        id: "play",
+        name: "Google Play Console",
+        description: "Installs, ratings, and store listing performance.",
+        logo: null,
+        badge: "GP",
       },
       {
         id: "revenuecat",
@@ -118,23 +149,32 @@ const categories: Category[] = [
 
 export function IntegrationsPanel({
   initialGsc,
+  initialBing,
   flash,
 }: {
   initialGsc: GscConnectionPublic | null;
+  initialBing: BingConnectionPublic | null;
   flash?: { success?: string; error?: string };
 }) {
   const { currentProject, setAddProjectOpen } = useWorkspace();
   const locked = !currentProject;
   const router = useRouter();
   const [gsc, setGsc] = useState(initialGsc);
+  const [bing, setBing] = useState(initialBing);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
     setGsc(initialGsc);
   }, [initialGsc]);
 
+  useEffect(() => {
+    setBing(initialBing);
+  }, [initialBing]);
+
   const gscConnected = gsc?.status === "connected";
   const gscPending = gsc?.status === "pending_property";
+  const bingConnected = bing?.status === "connected";
+  const bingPending = bing?.status === "pending_property";
 
   function renderActions(item: IntegrationDef) {
     if (locked) {
@@ -160,7 +200,7 @@ export function IntegrationsPanel({
             className="h-10 rounded-full px-5"
             onClick={() =>
               router.push(
-                `/dashboard/integrations/gsc?websiteId=${currentProject.id}`
+                `${enginePaths.gsc}?websiteId=${currentProject.id}`
               )
             }
           >
@@ -192,7 +232,7 @@ export function IntegrationsPanel({
           className="h-10 shrink-0 rounded-full bg-primary px-5 text-primary-foreground"
           onClick={() =>
             router.push(
-              `/dashboard/integrations/gsc?websiteId=${currentProject.id}`
+              `${enginePaths.gsc}?websiteId=${currentProject.id}`
             )
           }
         >
@@ -217,15 +257,81 @@ export function IntegrationsPanel({
       );
     }
 
+    if (item.id === "bing" && bingConnected) {
+      return (
+        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 rounded-full px-5"
+            onClick={() =>
+              router.push(
+                `${enginePaths.bing}?websiteId=${currentProject.id}`
+              )
+            }
+          >
+            Change site
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={pending}
+            className="h-9 rounded-full px-4 text-muted-foreground"
+            onClick={() =>
+              startTransition(async () => {
+                await disconnectBing(currentProject.id);
+                setBing(null);
+                router.refresh();
+              })
+            }
+          >
+            Disconnect
+          </Button>
+        </div>
+      );
+    }
+
+    if (item.id === "bing" && bingPending) {
+      return (
+        <Button
+          type="button"
+          className="h-10 shrink-0 rounded-full bg-primary px-5 text-primary-foreground"
+          onClick={() =>
+            router.push(
+              `${enginePaths.bing}?websiteId=${currentProject.id}`
+            )
+          }
+        >
+          Choose site
+        </Button>
+      );
+    }
+
+    if (item.id === "bing") {
+      return (
+        <Button
+          type="button"
+          className="h-10 shrink-0 rounded-full bg-primary px-5 text-primary-foreground"
+          asChild
+        >
+          <a
+            href={`/api/integrations/bing/connect?websiteId=${currentProject.id}`}
+          >
+            Connect
+          </a>
+        </Button>
+      );
+    }
+
     if (item.id === "trends") {
       return (
         <Button
           type="button"
           variant="outline"
           className="h-10 shrink-0 rounded-full px-5"
-          onClick={() => router.push("/dashboard/seo")}
+          onClick={() => router.push("/dashboard/demand")}
         >
-          Open in SEO
+          Open in Demand
         </Button>
       );
     }
@@ -246,18 +352,19 @@ export function IntegrationsPanel({
     <div className="flex-1 p-6 sm:p-8 lg:p-10">
       <div className="mx-auto w-full max-w-6xl space-y-8">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Integrations
-          </h2>
+          <h3 className="text-lg font-semibold tracking-tight">
+            Connected accounts
+          </h3>
           {locked ? (
-            <p className="mt-3 text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               No project selected. Add a project to connect data sources.
               Integrations belong to projects, not users.
             </p>
           ) : (
-            <p className="mt-3 text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               Connected to project{" "}
-              <span className="text-foreground">{currentProject.name}</span>
+              <span className="text-foreground">{currentProject.name}</span> —
+              grouped by Demand, Supply, and Convert.
             </p>
           )}
         </div>
@@ -284,6 +391,7 @@ export function IntegrationsPanel({
             <div className="space-y-3">
               {category.items.map((item) => {
                 const isGsc = item.id === "gsc";
+                const isBing = item.id === "bing";
                 return (
                   <BentoCard
                     key={item.id}
@@ -331,6 +439,17 @@ export function IntegrationsPanel({
                         {isGsc && gscPending && (
                           <p className="mt-2 text-xs text-amber-400">
                             Choose a Search Console property to finish setup
+                          </p>
+                        )}
+                        {isBing && bingConnected && bing?.property_uri && (
+                          <p className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400">
+                            <Check className="size-3" />
+                            Connected · {bing.property_uri}
+                          </p>
+                        )}
+                        {isBing && bingPending && (
+                          <p className="mt-2 text-xs text-amber-400">
+                            Choose a Bing Webmaster site to finish setup
                           </p>
                         )}
                       </div>

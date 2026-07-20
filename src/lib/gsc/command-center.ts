@@ -2,6 +2,7 @@ import {
   opportunityScore as scoreRowOpportunity,
   type GscOverviewStats,
 } from "@/lib/gsc/client";
+import type { BingOverviewStats } from "@/lib/bing/client";
 import {
   buildUnifiedPriorities,
   type PriorityCard,
@@ -162,7 +163,7 @@ function computeOpportunityScore(
   } else {
     label = "Most obvious opportunities addressed";
     detail =
-      "Fewer easy wins right now — dig into SEO for subtler moves.";
+      "Fewer easy wins right now — dig into Supply for subtler moves.";
   }
 
   return { score, label, detail };
@@ -204,54 +205,69 @@ function buildChannels(
   return [
     {
       id: "seo",
-      title: "SEO",
-      href: "/dashboard/seo",
-      connected: Boolean(stats),
+      title: "Demand Layer",
+      href: "/dashboard/demand",
+      connected: Boolean(seoPriority?.source === "trends") || Boolean(stats),
       metrics: [
-        { label: "Impressions", value: impDelta ?? "—" },
-        { label: "Clicks", value: formatClicksDelta(stats) },
-        { label: "Keyword movement", value: keywordMovement },
+        { label: "Trend signals", value: seoPriority ? "Live" : "—" },
+        { label: "Keyword intent", value: keywordMovement },
+        { label: "Listening", value: "—" },
       ],
       highlight: seoPriority
         ? seoPriority.label
         : stats
-          ? "No strong SEO opportunity right now"
-          : "Connect Search Console",
+          ? "No strong demand opportunity right now"
+          : "Connect Trends / Keyword Planner",
     },
     {
       id: "social",
-      title: "Social",
-      href: "/dashboard/social",
-      connected: false,
+      title: "Supply Layer",
+      href: "/dashboard/supply",
+      connected: Boolean(stats),
       metrics: [
-        { label: "Best content", value: "—" },
-        { label: "Views growth", value: "—" },
-        { label: "Winning hooks", value: "—" },
+        { label: "Impressions", value: impDelta ?? "—" },
+        { label: "Clicks", value: formatClicksDelta(stats) },
+        { label: "Publishing", value: "—" },
       ],
-      highlight: "Connect TikTok, Instagram, or X",
+      highlight:
+        priorities.find((p) => p.source === "search_console" || p.source === "bing")
+          ?.label ??
+        (stats
+          ? "No strong visibility opportunity right now"
+          : "Connect Search Console"),
     },
     {
       id: "app",
-      title: "App",
-      href: "/dashboard/app",
+      title: "Convert Layer",
+      href: "/dashboard/convert",
       connected: false,
       metrics: [
         { label: "Downloads", value: "—" },
         { label: "Ratings", value: "—" },
         { label: "Revenue", value: "—" },
       ],
-      highlight: "Connect App Store / RevenueCat",
+      highlight: "Connect App Store / PostHog",
     },
   ];
 }
 
-function buildRecentWins(stats: GscOverviewStats | null): RecentWin[] {
+function buildRecentWins(
+  stats: GscOverviewStats | null,
+  bingStats: BingOverviewStats | null = null
+): RecentWin[] {
   const wins: RecentWin[] = [];
   if (stats) {
     wins.push({
       id: "gsc-connected",
       label: "Connected Google Search Console",
-      detail: "Search signals feeding Overview and SEO",
+      detail: "Search signals feeding Overview and Supply",
+    });
+  }
+  if (bingStats) {
+    wins.push({
+      id: "bing-connected",
+      label: "Connected Bing Webmaster",
+      detail: "Bing early-ranking signals feeding Overview and Supply",
     });
   }
   return wins;
@@ -259,25 +275,32 @@ function buildRecentWins(stats: GscOverviewStats | null): RecentWin[] {
 
 export function buildCommandCenter(
   stats: GscOverviewStats | null,
-  trendOpportunities: TrendOpportunity[] = []
+  trendOpportunities: TrendOpportunity[] = [],
+  bingStats: BingOverviewStats | null = null
 ): CommandCenterData {
   const priorities = buildUnifiedPriorities({
     gscStats: stats,
+    bingStats,
     trendOpportunities,
     limit: 8,
   });
 
   if (!stats) {
-    const connectedIntegrations =
-      trendOpportunities.length > 0 ? ["Google Trends"] : [];
+    const connectedIntegrations = [
+      ...(bingStats ? ["Bing Webmaster"] : []),
+      ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
+    ];
     return {
       opportunityScore: computeOpportunityScore(null, priorities),
       weekSummary: [
         {
           id: "impressions",
           label: "Impression change",
-          value: "—",
-          tone: "neutral",
+          value: bingStats
+            ? new Intl.NumberFormat("en").format(bingStats.impressions)
+            : "—",
+          delta: bingStats ? "Bing impressions (period)" : undefined,
+          tone: bingStats && bingStats.impressions > 0 ? "positive" : "neutral",
         },
         {
           id: "rankings",
@@ -289,7 +312,7 @@ export function buildCommandCenter(
           id: "opportunities",
           label: "Open opportunities",
           value: String(priorities.length),
-          delta: "From Trends + Search Console",
+          delta: "From Trends + Search + Bing",
           tone: priorities.length > 0 ? "positive" : "neutral",
         },
         {
@@ -302,7 +325,7 @@ export function buildCommandCenter(
       priorities,
       recommendedContent: [],
       channels: buildChannels(null, priorities),
-      recentWins: buildRecentWins(null),
+      recentWins: buildRecentWins(null, bingStats),
       connectedIntegrations,
     };
   }
@@ -393,9 +416,10 @@ export function buildCommandCenter(
     priorities,
     recommendedContent,
     channels: buildChannels(stats, priorities),
-    recentWins: buildRecentWins(stats),
+    recentWins: buildRecentWins(stats, bingStats),
     connectedIntegrations: [
       "Google Search Console",
+      ...(bingStats ? ["Bing Webmaster"] : []),
       ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
     ],
   };

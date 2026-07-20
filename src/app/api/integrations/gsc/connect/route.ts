@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const msg = e instanceof Error ? e.message : "OAuth not configured";
     return NextResponse.redirect(
       new URL(
-        `/dashboard/integrations?gsc_error=${encodeURIComponent(msg)}`,
+        `/dashboard/engine/integrations?gsc_error=${encodeURIComponent(msg)}`,
         request.url
       )
     );
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   const websiteId = request.nextUrl.searchParams.get("websiteId");
   if (!websiteId) {
     return NextResponse.redirect(
-      new URL("/dashboard/integrations?gsc_error=missing_website", request.url)
+      new URL("/dashboard/engine/integrations?gsc_error=missing_website", request.url)
     );
   }
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
   if (!website) {
     return NextResponse.redirect(
-      new URL("/dashboard/integrations?gsc_error=website_not_found", request.url)
+      new URL("/dashboard/engine/integrations?gsc_error=website_not_found", request.url)
     );
   }
 

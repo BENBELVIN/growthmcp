@@ -66,7 +66,7 @@ export function GscPropertyPicker({ websiteId }: { websiteId: string }) {
             <Button
               variant="outline"
               className="h-10 rounded-full"
-              onClick={() => router.push("/dashboard/integrations")}
+              onClick={() => router.push("/dashboard/engine/integrations")}
             >
               Back
             </Button>
@@ -127,7 +127,7 @@ export function GscPropertyPicker({ websiteId }: { websiteId: string }) {
             type="button"
             variant="outline"
             className="h-10 rounded-full"
-            onClick={() => router.push("/dashboard/integrations")}
+            onClick={() => router.push("/dashboard/engine/integrations")}
           >
             Cancel
           </Button>

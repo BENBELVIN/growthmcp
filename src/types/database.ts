@@ -66,6 +66,37 @@ export type GscConnectionPublic = {
   updated_at: string;
 };
 
+export type BingConnectionStatus = "pending_property" | "connected" | "error";
+
+export type BingConnection = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  connected_by: string;
+  property_uri: string | null;
+  access_token: string;
+  refresh_token: string;
+  token_expires_at: string;
+  status: BingConnectionStatus;
+  last_error: string | null;
+  last_synced_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Safe fields for client UI (no tokens). */
+export type BingConnectionPublic = {
+  id: string;
+  website_id: string;
+  workspace_id: string;
+  property_uri: string | null;
+  status: BingConnectionStatus;
+  last_error: string | null;
+  last_synced_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type TrendDirection = "rising" | "stable" | "falling" | "unknown";
 
 export type TrendOpportunityStatus = "open" | "done" | "dismissed";
@@ -206,6 +237,40 @@ export type Database = {
           refresh_token?: string;
           token_expires_at?: string;
           status?: GscConnectionStatus;
+          last_error?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      bing_connections: {
+        Row: BingConnection;
+        Insert: {
+          id?: string;
+          website_id: string;
+          workspace_id: string;
+          connected_by: string;
+          property_uri?: string | null;
+          access_token: string;
+          refresh_token: string;
+          token_expires_at: string;
+          status?: BingConnectionStatus;
+          last_error?: string | null;
+          last_synced_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          website_id?: string;
+          workspace_id?: string;
+          connected_by?: string;
+          property_uri?: string | null;
+          access_token?: string;
+          refresh_token?: string;
+          token_expires_at?: string;
+          status?: BingConnectionStatus;
           last_error?: string | null;
           last_synced_at?: string | null;
           created_at?: string;

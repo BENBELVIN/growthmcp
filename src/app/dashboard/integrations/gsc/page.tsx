@@ -1,18 +1,15 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { GscPropertyPicker } from "@/components/dashboard/gsc-property-picker";
+import { enginePaths } from "@/lib/data/dashboard";
 
-export const metadata: Metadata = { title: "GSC Property" };
-
-export default async function GscPropertyPage({
+/** Legacy GSC property picker — moved under engine/integrations. */
+export default async function GscPropertyRedirect({
   searchParams,
 }: {
   searchParams: Promise<{ websiteId?: string }>;
 }) {
   const params = await searchParams;
   if (!params.websiteId) {
-    redirect("/dashboard/integrations");
+    redirect(enginePaths.integrations);
   }
-
-  return <GscPropertyPicker websiteId={params.websiteId} />;
+  redirect(`${enginePaths.gsc}?websiteId=${params.websiteId}`);
 }

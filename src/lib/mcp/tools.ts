@@ -6,9 +6,14 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   fetchGscOverview,
-  getValidAccessToken,
+  getValidAccessToken as getGscAccessToken,
   type GscOverviewStats,
 } from "@/lib/gsc/client";
+import {
+  fetchBingOverview,
+  getValidAccessToken as getBingAccessToken,
+  type BingOverviewStats,
+} from "@/lib/bing/client";
 import { buildCommandCenter } from "@/lib/gsc/command-center";
 import { buildUnifiedPriorities } from "@/lib/growth/priorities";
 import { listTrendOpportunities } from "@/lib/trends/repository";
@@ -53,7 +58,7 @@ async function loadGscStats(
     return null;
   }
 
-  const accessToken = await getValidAccessToken(admin as never, {
+  const accessToken = await getGscAccessToken(admin as never, {
     id: connection.id,
     access_token: connection.access_token,
     refresh_token: connection.refresh_token,
@@ -61,6 +66,40 @@ async function loadGscStats(
   });
 
   return fetchGscOverview(accessToken, connection.property_uri, "28d");
+}
+
+async function loadBingStats(
+  admin: Admin,
+  websiteId: string
+): Promise<BingOverviewStats | null> {
+  const { data: connection, error } = await admin
+    .from("bing_connections")
+    .select(
+      "id, website_id, workspace_id, property_uri, status, access_token, refresh_token, token_expires_at, last_synced_at"
+    )
+    .eq("website_id", websiteId)
+    .maybeSingle();
+
+  if (error) {
+    if (error.message.includes("bing_connections")) return null;
+    throw new Error(error.message);
+  }
+  if (
+    !connection ||
+    connection.status !== "connected" ||
+    !connection.property_uri
+  ) {
+    return null;
+  }
+
+  const accessToken = await getBingAccessToken(admin as never, {
+    id: connection.id,
+    access_token: connection.access_token,
+    refresh_token: connection.refresh_token,
+    token_expires_at: connection.token_expires_at,
+  });
+
+  return fetchBingOverview(accessToken, connection.property_uri, "28d");
 }
 
 export async function mcpListProjects() {
@@ -84,13 +123,15 @@ export async function mcpGetGrowthPriorities(websiteId?: string, limit = 15) {
 
   const admin = createAdminClient();
   const website = await getWebsite(admin, id);
-  const [stats, trendOpportunities] = await Promise.all([
+  const [gscStats, bingStats, trendOpportunities] = await Promise.all([
     loadGscStats(admin, id),
+    loadBingStats(admin, id).catch(() => null),
     listTrendOpportunities(admin, id, "open").catch(() => []),
   ]);
 
   const priorities = buildUnifiedPriorities({
-    gscStats: stats,
+    gscStats,
+    bingStats,
     trendOpportunities,
     limit,
   });
@@ -112,12 +153,13 @@ export async function mcpGetProjectContext(websiteId?: string) {
 
   const admin = createAdminClient();
   const website = await getWebsite(admin, id);
-  const [stats, trendOpportunities] = await Promise.all([
+  const [stats, bingStats, trendOpportunities] = await Promise.all([
     loadGscStats(admin, id),
+    loadBingStats(admin, id).catch(() => null),
     listTrendOpportunities(admin, id, "open").catch(() => []),
   ]);
 
-  const command = buildCommandCenter(stats, trendOpportunities);
+  const command = buildCommandCenter(stats, trendOpportunities, bingStats);
 
   return {
     project: {
@@ -150,14 +192,16 @@ export async function mcpGetSeoInsights(websiteId?: string) {
     );
   }
 
-  const [searchConsole, trends] = await Promise.all([
+  const [searchConsole, bing, trends] = await Promise.all([
     mcpGetSearchConsole(id),
+    mcpGetBingWebmaster(id),
     mcpGetTrendOpportunities(id),
   ]);
 
   return {
     channel: "seo" as const,
     searchConsole,
+    bing,
     trends,
   };
 }
@@ -254,6 +298,44 @@ export async function mcpGetSearchConsole(websiteId?: string) {
   };
 }
 
+export async function mcpGetBingWebmaster(websiteId?: string) {
+  const id = resolveWebsiteId(websiteId);
+  if (!id) {
+    throw new Error(
+      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+    );
+  }
+
+  const admin = createAdminClient();
+  const website = await getWebsite(admin, id);
+  const stats = await loadBingStats(admin, id);
+
+  if (!stats) {
+    return {
+      project: { id: website.id, name: website.name, url: website.url },
+      connected: false,
+      message: "Bing Webmaster is not connected for this project.",
+    };
+  }
+
+  return {
+    project: { id: website.id, name: website.name, url: website.url },
+    connected: true,
+    range: stats.range,
+    propertyUri: stats.propertyUri,
+    totals: {
+      clicks: stats.clicks,
+      impressions: stats.impressions,
+      ctr: stats.ctr,
+      position: stats.position,
+    },
+    topQueries: stats.topQueries.slice(0, 25),
+    topPages: stats.topPages.slice(0, 25),
+    pageOpportunities: stats.pageOpportunities.slice(0, 15),
+    queryOpportunities: stats.queryOpportunities.slice(0, 15),
+  };
+}
+
 export async function mcpGetTrendOpportunities(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
@@ -285,11 +367,12 @@ export async function mcpGetRecommendedContent(websiteId?: string) {
 
   const admin = createAdminClient();
   const website = await getWebsite(admin, id);
-  const [stats, trendOpportunities] = await Promise.all([
+  const [stats, bingStats, trendOpportunities] = await Promise.all([
     loadGscStats(admin, id),
+    loadBingStats(admin, id).catch(() => null),
     listTrendOpportunities(admin, id, "open").catch(() => []),
   ]);
-  const command = buildCommandCenter(stats, trendOpportunities);
+  const command = buildCommandCenter(stats, trendOpportunities, bingStats);
 
   return {
     project: { id: website.id, name: website.name, url: website.url },

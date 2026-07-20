@@ -1,10 +1,6 @@
-import type { Metadata } from "next";
-import { SeoPage } from "@/components/dashboard/seo-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "SEO",
-};
-
-export default function SeoRoute() {
-  return <SeoPage />;
+/** Legacy SEO route — Search Console / Bing live under Supply; Trends under Demand. */
+export default function SeoRedirect() {
+  redirect("/dashboard/supply");
 }

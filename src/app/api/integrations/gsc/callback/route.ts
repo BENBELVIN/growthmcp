@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const redirectUri = `${origin}/api/integrations/gsc/callback`;
   const fail = (msg: string) =>
     NextResponse.redirect(
-      new URL(`/dashboard/integrations?gsc_error=${encodeURIComponent(msg)}`, origin)
+      new URL(`/dashboard/engine/integrations?gsc_error=${encodeURIComponent(msg)}`, origin)
     );
 
   const code = request.nextUrl.searchParams.get("code");
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
             .eq("website_id", payload.websiteId);
 
           const res = NextResponse.redirect(
-            new URL("/dashboard/integrations?gsc=connected", origin)
+            new URL("/dashboard/engine/integrations?gsc=connected", origin)
           );
           res.cookies.delete(GSC_OAUTH_STATE_COOKIE);
           return res;
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
     const res = NextResponse.redirect(
       new URL(
-        `/dashboard/integrations/gsc?websiteId=${payload.websiteId}`,
+        `/dashboard/engine/integrations/gsc?websiteId=${payload.websiteId}`,
         origin
       )
     );

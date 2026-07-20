@@ -16,7 +16,7 @@ const columns = [
     links: [
       { href: "/docs", label: "Documentation" },
       { href: "/docs#tools", label: "Tool reference" },
-      { href: "/dashboard/mcp", label: "MCP setup" },
+      { href: "/dashboard/engine/mcp", label: "MCP setup" },
       { href: "https://modelcontextprotocol.io", label: "About MCP" },
     ],
   },

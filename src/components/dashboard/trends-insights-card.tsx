@@ -119,7 +119,7 @@ export function TrendsInsightsCard({ websiteId }: { websiteId: string }) {
               className="mt-5 h-9 rounded-full"
               asChild
             >
-              <Link href="/dashboard/integrations">
+              <Link href="/dashboard/engine/integrations">
                 Connect Search Console for better seeds
               </Link>
             </Button>
@@ -218,7 +218,7 @@ export function TrendsInsightsCard({ websiteId }: { websiteId: string }) {
                   </p>
                 </div>
                 <Button size="sm" className="h-9 shrink-0 rounded-full" asChild>
-                  <Link href="/dashboard/mcp">
+                  <Link href="/dashboard/engine/mcp">
                     Work in Cursor
                     <ArrowRight className="size-3.5" />
                   </Link>

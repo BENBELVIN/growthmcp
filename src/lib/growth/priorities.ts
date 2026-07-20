@@ -9,10 +9,11 @@ import {
   type GscDimRow,
   type GscOverviewStats,
 } from "@/lib/gsc/client";
+import type { BingOverviewStats } from "@/lib/bing/client";
 import { shortPagePath } from "@/lib/gsc/labels";
 import type { TrendOpportunity } from "@/types/database";
 
-export type PrioritySource = "search_console" | "trends";
+export type PrioritySource = "search_console" | "bing" | "trends";
 export type PriorityKind = "page" | "keyword";
 
 export type PriorityCard = {
@@ -70,6 +71,23 @@ function fromGscPages(rows: GscDimRow[]): PriorityCard[] {
   });
 }
 
+function fromBingPages(rows: GscDimRow[]): PriorityCard[] {
+  return rows.map((row) => {
+    const score = Math.min(100, Math.round(scoreRowOpportunity(row) * 1.05));
+    return {
+      id: `bing-page:${row.key}`,
+      target: row.key,
+      label: shortPagePath(row.key),
+      opportunity: pageOpportunityLabel(row),
+      why: `Bing · ${new Intl.NumberFormat("en").format(row.impressions)} impressions · ${(row.ctr * 100).toFixed(1)}% CTR · pos ${row.position.toFixed(1)}`,
+      impact: impactFromScore(score),
+      source: "bing" as const,
+      kind: "page" as const,
+      score,
+    };
+  });
+}
+
 function fromTrendOpportunities(rows: TrendOpportunity[]): PriorityCard[] {
   return rows.map((row) => {
     const score = Math.min(100, Math.round(Number(row.trend_score) || 0));
@@ -92,11 +110,12 @@ function fromTrendOpportunities(rows: TrendOpportunity[]): PriorityCard[] {
 }
 
 /**
- * Merge GSC + Trends into one ranked queue.
+ * Merge GSC + Bing + Trends into one ranked queue.
  * Dedupes near-duplicates by normalized target; keeps the higher score.
  */
 export function buildUnifiedPriorities(input: {
   gscStats?: GscOverviewStats | null;
+  bingStats?: BingOverviewStats | null;
   trendOpportunities?: TrendOpportunity[];
   limit?: number;
 }): PriorityCard[] {
@@ -104,13 +123,16 @@ export function buildUnifiedPriorities(input: {
   const gscCards = fromGscPages(
     input.gscStats?.pageOpportunities.slice(0, 12) ?? []
   );
+  const bingCards = fromBingPages(
+    input.bingStats?.pageOpportunities.slice(0, 12) ?? []
+  );
   const trendCards = fromTrendOpportunities(
     (input.trendOpportunities ?? []).slice(0, 15)
   );
 
   const byKey = new Map<string, PriorityCard>();
 
-  for (const card of [...gscCards, ...trendCards]) {
+  for (const card of [...gscCards, ...bingCards, ...trendCards]) {
     const key = normalizeKey(card.target);
     const existing = byKey.get(key);
     if (!existing || card.score > existing.score) {
@@ -133,11 +155,17 @@ export function buildUnifiedPriorities(input: {
         existing.source !== card.source &&
         Math.abs(existing.score - card.score) < 12
       ) {
+        const otherLabel =
+          card.source === "trends"
+            ? "Search Console"
+            : card.source === "bing"
+              ? "Bing"
+              : existing.source === "bing"
+                ? "Bing"
+                : "Trends";
         byKey.set(key, {
           ...card,
-          why: `${card.why} · Also signaled by ${
-            card.source === "trends" ? "Search Console" : "Trends"
-          }.`,
+          why: `${card.why} · Also signaled by ${otherLabel}.`,
           score: Math.max(existing.score, card.score),
           impact: impactFromScore(Math.max(existing.score, card.score)),
         });

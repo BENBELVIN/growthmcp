@@ -2,7 +2,7 @@
  * GrowthMCP stdio server for Cursor.
  *
  * Run: npm run mcp
- * Cursor config: see /dashboard/mcp
+ * Cursor config: see /dashboard/engine/mcp
  *
  * Loads .env.local via @next/env. Requires SUPABASE_SERVICE_ROLE_KEY.
  */
@@ -99,7 +99,7 @@ server.registerTool(
   "get_seo_insights",
   {
     description:
-      "SEO channel insights: Search Console totals/queries/pages plus Trends opportunities.",
+      "SEO channel insights: Google Search Console + Bing Webmaster totals/queries/pages plus Trends opportunities.",
     inputSchema: {
       websiteId: websiteIdField,
     },

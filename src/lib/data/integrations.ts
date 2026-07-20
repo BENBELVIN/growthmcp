@@ -1,5 +1,6 @@
 export const integrations = [
   { name: "Google Search Console", short: "GSC", color: "#4285F4" },
+  { name: "Bing Webmaster", short: "Bing", color: "#00809D" },
   { name: "Google Trends", short: "Trends", color: "#34A853" },
   { name: "Cursor", short: "Cursor", color: "#F5F5F5" },
   { name: "GitHub", short: "GitHub", color: "#E6EDF3" },
@@ -23,6 +24,10 @@ export const mcpTools = [
   {
     name: "get_search_console",
     description: "GSC totals, top queries/pages, and opportunity rows.",
+  },
+  {
+    name: "get_bing_webmaster",
+    description: "Bing clicks, impressions, queries, and pages.",
   },
   {
     name: "get_trend_opportunities",

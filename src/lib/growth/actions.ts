@@ -4,12 +4,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   fetchGscOverview,
-  getValidAccessToken,
+  getValidAccessToken as getGscAccessToken,
 } from "@/lib/gsc/client";
+import {
+  fetchBingOverview,
+  getValidAccessToken as getBingAccessToken,
+  type BingOverviewStats,
+} from "@/lib/bing/client";
 import { buildCommandCenter, type CommandCenterData } from "@/lib/gsc/command-center";
 import { getGscConnectionSecret } from "@/lib/gsc/queries";
+import { getBingConnectionSecret } from "@/lib/bing/queries";
 import { listTrendOpportunities } from "@/lib/trends/repository";
 import { buildUnifiedPriorities } from "@/lib/growth/priorities";
+import type { GscOverviewStats } from "@/lib/gsc/client";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -20,8 +27,40 @@ async function requireUser() {
   return { supabase, user };
 }
 
+async function loadGscStats(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  websiteId: string
+): Promise<GscOverviewStats | null> {
+  const connection = await getGscConnectionSecret(websiteId);
+  if (
+    !connection ||
+    connection.status !== "connected" ||
+    !connection.property_uri
+  ) {
+    return null;
+  }
+  const accessToken = await getGscAccessToken(supabase, connection);
+  return fetchGscOverview(accessToken, connection.property_uri, "28d");
+}
+
+async function loadBingStats(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  websiteId: string
+): Promise<BingOverviewStats | null> {
+  const connection = await getBingConnectionSecret(websiteId);
+  if (
+    !connection ||
+    connection.status !== "connected" ||
+    !connection.property_uri
+  ) {
+    return null;
+  }
+  const accessToken = await getBingAccessToken(supabase, connection);
+  return fetchBingOverview(accessToken, connection.property_uri, "28d");
+}
+
 /**
- * Overview command centre: merged Top priorities from Search Console + Trends.
+ * Overview command centre: merged Top priorities from Search Console + Bing + Trends.
  * This is the queue MCP should expose to Cursor.
  */
 export async function getOverviewCommandCenter(websiteId: string): Promise<{
@@ -45,33 +84,25 @@ export async function getOverviewCommandCenter(websiteId: string): Promise<{
   }
 
   try {
-    const connection = await getGscConnectionSecret(websiteId);
-    if (
-      !connection ||
-      connection.status !== "connected" ||
-      !connection.property_uri
-    ) {
-      const command = buildCommandCenter(null, trendOpportunities);
-      return {
-        connected: false,
-        command: command.priorities.length > 0 ? command : null,
-      };
-    }
+    const [gscStats, bingStats] = await Promise.all([
+      loadGscStats(supabase, websiteId).catch(() => null),
+      loadBingStats(supabase, websiteId).catch(() => null),
+    ]);
 
-    const accessToken = await getValidAccessToken(supabase, connection);
-    const stats = await fetchGscOverview(
-      accessToken,
-      connection.property_uri,
-      "28d"
+    const command = buildCommandCenter(
+      gscStats,
+      trendOpportunities,
+      bingStats
     );
+    const connected = Boolean(gscStats || bingStats || trendOpportunities.length);
 
     return {
-      connected: true,
-      command: buildCommandCenter(stats, trendOpportunities),
+      connected,
+      command:
+        connected || command.priorities.length > 0 ? command : null,
     };
   } catch (e) {
-    // Still surface Trends-only priorities if GSC fails
-    const command = buildCommandCenter(null, trendOpportunities);
+    const command = buildCommandCenter(null, trendOpportunities, null);
     return {
       connected: trendOpportunities.length > 0,
       command: command.priorities.length > 0 ? command : null,
@@ -103,31 +134,15 @@ export async function getGrowthPrioritiesForWebsite(
   }
 
   try {
-    const connection = await getGscConnectionSecret(websiteId);
-    if (
-      !connection ||
-      connection.status !== "connected" ||
-      !connection.property_uri
-    ) {
-      return {
-        priorities: buildUnifiedPriorities({
-          gscStats: null,
-          trendOpportunities,
-          limit,
-        }),
-      };
-    }
-
-    const accessToken = await getValidAccessToken(supabase, connection);
-    const stats = await fetchGscOverview(
-      accessToken,
-      connection.property_uri,
-      "28d"
-    );
+    const [gscStats, bingStats] = await Promise.all([
+      loadGscStats(supabase, websiteId).catch(() => null),
+      loadBingStats(supabase, websiteId).catch(() => null),
+    ]);
 
     return {
       priorities: buildUnifiedPriorities({
-        gscStats: stats,
+        gscStats,
+        bingStats,
         trendOpportunities,
         limit,
       }),
@@ -136,6 +151,7 @@ export async function getGrowthPrioritiesForWebsite(
     return {
       priorities: buildUnifiedPriorities({
         gscStats: null,
+        bingStats: null,
         trendOpportunities,
         limit,
       }),

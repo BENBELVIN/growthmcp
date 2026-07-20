@@ -1,5 +1,6 @@
 "use client";
 
+import { BingOverviewCard } from "@/components/dashboard/bing-overview-card";
 import { GscOverviewCard } from "@/components/dashboard/gsc-overview-card";
 import { TrendsInsightsCard } from "@/components/dashboard/trends-insights-card";
 import { useWorkspace } from "@/components/dashboard/workspace-provider";
@@ -15,7 +16,8 @@ export function SeoPage() {
         <div className="mx-auto w-full max-w-6xl space-y-4">
           <h2 className="text-2xl font-semibold tracking-tight">SEO</h2>
           <p className="text-muted-foreground">
-            Select a project to explore Search Console and Trends signals.
+            Select a project to explore Search Console, Bing, and Trends
+            signals.
           </p>
           <Button
             type="button"
@@ -54,6 +56,12 @@ export function SeoPage() {
               Google Search Console
             </TabsTrigger>
             <TabsTrigger
+              value="bing"
+              className="rounded-none px-4 py-2.5 text-sm data-active:bg-transparent"
+            >
+              Bing Webmaster
+            </TabsTrigger>
+            <TabsTrigger
               value="google-trends"
               className="rounded-none px-4 py-2.5 text-sm data-active:bg-transparent"
             >
@@ -70,6 +78,10 @@ export function SeoPage() {
 
           <TabsContent value="search-console" className="mt-2 outline-none">
             <GscOverviewCard websiteId={currentProject.id} />
+          </TabsContent>
+
+          <TabsContent value="bing" className="mt-2 outline-none">
+            <BingOverviewCard websiteId={currentProject.id} />
           </TabsContent>
 
           <TabsContent value="google-trends" className="mt-2 outline-none">
