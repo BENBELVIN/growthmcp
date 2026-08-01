@@ -66,7 +66,7 @@ export function BingPropertyPicker({ websiteId }: { websiteId: string }) {
             <Button
               variant="outline"
               className="h-10 rounded-full"
-              onClick={() => router.push("/dashboard/engine/integrations")}
+              onClick={() => router.push("/dashboard/settings")}
             >
               Back
             </Button>
@@ -127,7 +127,7 @@ export function BingPropertyPicker({ websiteId }: { websiteId: string }) {
             type="button"
             variant="outline"
             className="h-10 rounded-full"
-            onClick={() => router.push("/dashboard/engine/integrations")}
+            onClick={() => router.push("/dashboard/settings")}
           >
             Cancel
           </Button>

@@ -1,8 +1,5 @@
-import type { Metadata } from "next";
-import { McpSetupPage } from "@/components/dashboard/mcp-setup-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "MCP" };
-
-export default function EngineMcpPage() {
-  return <McpSetupPage repoPath={process.cwd()} />;
+export default function Page() {
+  redirect("/dashboard/settings");
 }

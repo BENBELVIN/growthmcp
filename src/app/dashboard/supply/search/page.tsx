@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { SupplyLayerPage } from "@/components/dashboard/supply-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Search Console & Bing",
-};
-
-export default function SupplySearchRoute() {
-  return <SupplyLayerPage defaultTab="search-console" />;
+export default function Page() {
+  redirect("/dashboard/content-rankings");
 }

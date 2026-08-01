@@ -11,7 +11,7 @@ export function AddProjectDialog() {
     <Dialog open={addProjectOpen} onOpenChange={setAddProjectOpen}>
       <DialogHeader
         title="Add Project"
-        description="Projects are the sites GrowthMCP analyzes. Integrations and growth data attach to the project you select."
+        description="Projects are the sites GrowthSEO analyses. Connect Search Console and Trends per project."
         onClose={() => setAddProjectOpen(false)}
       />
       <DialogBody>

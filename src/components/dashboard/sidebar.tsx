@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Blocks,
+  FileText,
   LayoutDashboard,
-  Megaphone,
   Radar,
   Settings,
-  Target,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,9 +15,7 @@ import { navItems } from "@/lib/data/dashboard";
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
   Radar,
-  Megaphone,
-  Target,
-  Blocks,
+  FileText,
   Settings,
 };
 
@@ -29,7 +25,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "flex w-64 shrink-0 flex-col border-r border-border/80 bg-sidebar/50 backdrop-blur-xl",
+        "flex w-64 shrink-0 flex-col border-r border-border/80 bg-background/50 backdrop-blur-xl",
         className
       )}
     >

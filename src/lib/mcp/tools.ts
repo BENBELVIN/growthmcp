@@ -168,8 +168,7 @@ export async function mcpGetProjectContext(websiteId?: string) {
       url: website.url,
     },
     opportunityScore: command.opportunityScore,
-    weekSummary: command.weekSummary,
-    channels: command.channels,
+    seoMetrics: command.seoMetrics,
     connectedIntegrations: command.connectedIntegrations,
     topPriorities: command.priorities.slice(0, 5),
     recommendedContent: command.recommendedContent,
@@ -203,60 +202,6 @@ export async function mcpGetSeoInsights(websiteId?: string) {
     searchConsole,
     bing,
     trends,
-  };
-}
-
-export async function mcpGetSocialInsights(websiteId?: string) {
-  const id = resolveWebsiteId(websiteId);
-  if (!id) {
-    throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
-    );
-  }
-
-  const admin = createAdminClient();
-  const website = await getWebsite(admin, id);
-
-  return {
-    channel: "social" as const,
-    project: { id: website.id, name: website.name, url: website.url },
-    connected: false,
-    platforms: ["tiktok", "instagram", "x"] as const,
-    message:
-      "Social integrations are not connected yet. Connect TikTok, Instagram, or X on the Integrations page.",
-    metrics: {
-      bestPerformingContent: null,
-      viewsGrowth: null,
-      winningHooks: null,
-    },
-  };
-}
-
-export async function mcpGetAppMetrics(websiteId?: string) {
-  const id = resolveWebsiteId(websiteId);
-  if (!id) {
-    throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
-    );
-  }
-
-  const admin = createAdminClient();
-  const website = await getWebsite(admin, id);
-
-  return {
-    channel: "app" as const,
-    project: { id: website.id, name: website.name, url: website.url },
-    connected: false,
-    sources: ["app_store_connect", "revenuecat", "posthog"] as const,
-    message:
-      "App growth integrations are not connected yet. Connect App Store Connect, RevenueCat, or PostHog on the Integrations page.",
-    metrics: {
-      downloads: null,
-      subscriptions: null,
-      revenue: null,
-      reviews: null,
-      conversion: null,
-    },
   };
 }
 

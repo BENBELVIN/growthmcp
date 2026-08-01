@@ -1,21 +1,21 @@
 export const navItems = [
   { href: "/dashboard", label: "Overview", icon: "LayoutDashboard" },
-  { href: "/dashboard/demand", label: "Demand", icon: "Radar" },
-  { href: "/dashboard/supply", label: "Supply", icon: "Megaphone" },
-  { href: "/dashboard/convert", label: "Convert", icon: "Target" },
   {
-    href: "/dashboard/engine",
-    label: "MCP & Integrations",
-    icon: "Blocks",
+    href: "/dashboard/keyword-opportunities",
+    label: "Keyword Opportunities",
+    icon: "Radar",
+  },
+  {
+    href: "/dashboard/content-rankings",
+    label: "Content & Rankings",
+    icon: "FileText",
   },
   { href: "/dashboard/settings", label: "Settings", icon: "Settings" },
 ] as const;
 
-/** Canonical paths for the MCP & Integrations engine area. */
-export const enginePaths = {
-  root: "/dashboard/engine",
-  mcp: "/dashboard/engine/mcp",
-  integrations: "/dashboard/engine/integrations",
-  gsc: "/dashboard/engine/integrations/gsc",
-  bing: "/dashboard/engine/integrations/bing",
+/** Integration setup paths under Settings. */
+export const settingsPaths = {
+  root: "/dashboard/settings",
+  gsc: "/dashboard/settings/integrations/gsc",
+  bing: "/dashboard/settings/integrations/bing",
 } as const;

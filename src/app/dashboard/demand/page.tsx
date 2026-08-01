@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { DemandLayerPage } from "@/components/dashboard/demand-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Demand Layer",
-};
-
-export default function DemandRoute() {
-  return <DemandLayerPage />;
+export default function Page() {
+  redirect("/dashboard/keyword-opportunities");
 }

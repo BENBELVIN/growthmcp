@@ -83,9 +83,9 @@ export default async function DashboardLayout({
   const needsOnboarding = projects.length === 0;
 
   return (
-    <div className="dark relative flex min-h-screen flex-col bg-background text-foreground">
-      <div className="pointer-events-none absolute inset-0 grid-fade opacity-60" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[480px] bg-[radial-gradient(ellipse_55%_45%_at_40%_-10%,rgba(100,180,255,0.12),transparent_70%)]" />
+    <div className="relative flex min-h-screen flex-col bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-0 grid-fade-light" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(20,160,140,0.14),transparent_70%)]" />
 
       <WorkspaceProvider
         user={user}

@@ -17,7 +17,7 @@ export type OpportunityScore = {
   detail: string;
 };
 
-export type WeekSummaryItem = {
+export type SeoMetric = {
   id: string;
   label: string;
   value: string;
@@ -32,18 +32,6 @@ export type ContentIdea = {
   impressions: number;
 };
 
-export type GrowthChannelId = "seo" | "social" | "app";
-
-export type ChannelOverviewCard = {
-  id: GrowthChannelId;
-  title: string;
-  href: string;
-  connected: boolean;
-  metrics: { label: string; value: string }[];
-  /** Top opportunity or CTA when empty. */
-  highlight: string;
-};
-
 export type RecentWin = {
   id: string;
   label: string;
@@ -52,12 +40,10 @@ export type RecentWin = {
 
 export type CommandCenterData = {
   opportunityScore: OpportunityScore;
-  weekSummary: WeekSummaryItem[];
+  seoMetrics: SeoMetric[];
   priorities: PriorityCard[];
   recommendedContent: ContentIdea[];
-  channels: ChannelOverviewCard[];
   recentWins: RecentWin[];
-  /** Integrations connected for the active project. */
   connectedIntegrations: string[];
 };
 
@@ -103,9 +89,6 @@ function avgPosition(rows: GscOverviewStats["daily"]) {
   return weighted.weight > 0 ? weighted.pos / weighted.weight : 0;
 }
 
-/**
- * How much actionable opportunity the engine sees — not business health.
- */
 function computeOpportunityScore(
   stats: GscOverviewStats | null,
   priorities: PriorityCard[]
@@ -140,7 +123,10 @@ function computeOpportunityScore(
     score = Math.round(
       Math.max(
         0,
-        Math.min(100, pageSignal * 0.7 * 1.8 + querySignal * 0.3 * 1.8 + trendsBoost)
+        Math.min(
+          100,
+          pageSignal * 0.7 * 1.8 + querySignal * 0.3 * 1.8 + trendsBoost
+        )
       )
     );
   } else {
@@ -154,16 +140,16 @@ function computeOpportunityScore(
     label = "High-impact improvements available";
     detail =
       highImpact > 0
-        ? `${highImpact} high-impact items in Top priorities — start there.`
-        : "Several strong opportunities are waiting — work the priority queue.";
+        ? `${highImpact} high-impact items ready — start there.`
+        : "Several strong opportunities are waiting in your priority queue.";
   } else if (score >= 40) {
     label = "Solid opportunities still open";
     detail =
-      "A clear set of next actions remains across Search Console and Trends.";
+      "Clear next actions remain across Search Console and Trends.";
   } else {
-    label = "Most obvious opportunities addressed";
+    label = "Most obvious wins addressed";
     detail =
-      "Fewer easy wins right now — dig into Supply for subtler moves.";
+      "Fewer easy wins right now — dig into Content & Rankings for subtler moves.";
   }
 
   return { score, label, detail };
@@ -177,76 +163,121 @@ function formatClicksDelta(stats: GscOverviewStats | null): string {
   return formatPct(pctChange(recentClicks, priorClicks)) ?? "—";
 }
 
-function buildChannels(
+function countPagesInSearch(stats: GscOverviewStats | null): number {
+  if (!stats) return 0;
+  const keys = new Set([
+    ...stats.topPages.map((p) => p.key),
+    ...stats.pageOpportunities.map((p) => p.key),
+  ]);
+  return keys.size;
+}
+
+function countPagesNeedingAttention(stats: GscOverviewStats | null): number {
+  if (!stats) return 0;
+  return stats.pageOpportunities.filter(
+    (p) => p.position > 20 || (p.impressions >= 15 && p.ctr < 0.02)
+  ).length;
+}
+
+function buildSeoMetrics(
   stats: GscOverviewStats | null,
+  bingStats: BingOverviewStats | null,
   priorities: PriorityCard[]
-): ChannelOverviewCard[] {
-  const seoPriority = priorities.find(
-    (p) => p.source === "search_console" || p.source === "trends"
-  );
+): SeoMetric[] {
   const { recent, prior } = stats
     ? splitDaily(stats)
     : { recent: [], prior: [] };
   const impDelta = stats
-    ? formatPct(
-        pctChange(sumMetric(recent, "impressions"), sumMetric(prior, "impressions"))
-      )
+    ? pctChange(sumMetric(recent, "impressions"), sumMetric(prior, "impressions"))
     : null;
-
   const recentPos = stats ? avgPosition(recent) : 0;
   const priorPos = stats ? avgPosition(prior) : 0;
   const posDelta =
     stats && priorPos > 0 && recentPos > 0 ? priorPos - recentPos : null;
-  const keywordMovement =
-    posDelta === null
-      ? "—"
-      : `${posDelta > 0 ? "↑" : posDelta < 0 ? "↓" : "→"} ${Math.abs(posDelta).toFixed(1)}`;
+
+  const clicks =
+    stats?.clicks ??
+    (bingStats ? bingStats.clicks : null);
+  const impressions =
+    stats?.impressions ??
+    (bingStats ? bingStats.impressions : null);
+  const position = stats?.position ?? null;
 
   return [
     {
-      id: "seo",
-      title: "Demand Layer",
-      href: "/dashboard/demand",
-      connected: Boolean(seoPriority?.source === "trends") || Boolean(stats),
-      metrics: [
-        { label: "Trend signals", value: seoPriority ? "Live" : "—" },
-        { label: "Keyword intent", value: keywordMovement },
-        { label: "Listening", value: "—" },
-      ],
-      highlight: seoPriority
-        ? seoPriority.label
-        : stats
-          ? "No strong demand opportunity right now"
-          : "Connect Trends / Keyword Planner",
+      id: "clicks",
+      label: "Organic clicks",
+      value:
+        clicks !== null
+          ? new Intl.NumberFormat("en").format(Math.round(clicks))
+          : "—",
+      delta: stats ? formatClicksDelta(stats) : undefined,
+      tone:
+        stats && formatClicksDelta(stats)?.startsWith("+")
+          ? "positive"
+          : stats && formatClicksDelta(stats)?.startsWith("-")
+            ? "negative"
+            : "neutral",
     },
     {
-      id: "social",
-      title: "Supply Layer",
-      href: "/dashboard/supply",
-      connected: Boolean(stats),
-      metrics: [
-        { label: "Impressions", value: impDelta ?? "—" },
-        { label: "Clicks", value: formatClicksDelta(stats) },
-        { label: "Publishing", value: "—" },
-      ],
-      highlight:
-        priorities.find((p) => p.source === "search_console" || p.source === "bing")
-          ?.label ??
-        (stats
-          ? "No strong visibility opportunity right now"
-          : "Connect Search Console"),
+      id: "impressions",
+      label: "Impressions",
+      value:
+        impressions !== null
+          ? new Intl.NumberFormat("en").format(Math.round(impressions))
+          : "—",
+      delta: impDelta !== null ? formatPct(impDelta) : undefined,
+      tone:
+        impDelta === null
+          ? "neutral"
+          : impDelta > 2
+            ? "positive"
+            : impDelta < -2
+              ? "negative"
+              : "neutral",
     },
     {
-      id: "app",
-      title: "Convert Layer",
-      href: "/dashboard/convert",
-      connected: false,
-      metrics: [
-        { label: "Downloads", value: "—" },
-        { label: "Ratings", value: "—" },
-        { label: "Revenue", value: "—" },
-      ],
-      highlight: "Connect App Store / PostHog",
+      id: "position",
+      label: "Average position",
+      value: position !== null ? position.toFixed(1) : "—",
+      delta:
+        posDelta === null
+          ? undefined
+          : `${posDelta > 0 ? "↑" : posDelta < 0 ? "↓" : "→"} ${Math.abs(posDelta).toFixed(1)}`,
+      tone:
+        posDelta === null
+          ? "neutral"
+          : posDelta > 0.3
+            ? "positive"
+            : posDelta < -0.3
+              ? "negative"
+              : "neutral",
+    },
+    {
+      id: "indexed",
+      label: "Pages in search",
+      value: stats ? String(countPagesInSearch(stats)) : "—",
+      delta: stats ? "Tracked in Search Console" : undefined,
+      tone: "neutral",
+    },
+    {
+      id: "opportunities",
+      label: "Ranking opportunities",
+      value: String(priorities.length),
+      delta: `${priorities.filter((p) => p.impact === "High").length} high impact`,
+      tone: priorities.length > 0 ? "positive" : "neutral",
+    },
+    {
+      id: "attention",
+      label: "Pages needing attention",
+      value: stats ? String(countPagesNeedingAttention(stats)) : "—",
+      delta: "Weak CTR or page 2+",
+      tone:
+        stats && countPagesNeedingAttention(stats) > 3
+          ? "negative"
+          : stats && countPagesNeedingAttention(stats) > 0
+            ? "neutral"
+            : "positive",
     },
   ];
 }
@@ -260,14 +291,14 @@ function buildRecentWins(
     wins.push({
       id: "gsc-connected",
       label: "Connected Google Search Console",
-      detail: "Search signals feeding Overview and Supply",
+      detail: "Search data feeding your SEO overview",
     });
   }
   if (bingStats) {
     wins.push({
       id: "bing-connected",
       label: "Connected Bing Webmaster",
-      detail: "Bing early-ranking signals feeding Overview and Supply",
+      detail: "Bing ranking signals included in your overview",
     });
   }
   return wins;
@@ -285,142 +316,30 @@ export function buildCommandCenter(
     limit: 8,
   });
 
-  if (!stats) {
-    const connectedIntegrations = [
-      ...(bingStats ? ["Bing Webmaster"] : []),
-      ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
-    ];
-    return {
-      opportunityScore: computeOpportunityScore(null, priorities),
-      weekSummary: [
-        {
-          id: "impressions",
-          label: "Impression change",
-          value: bingStats
-            ? new Intl.NumberFormat("en").format(bingStats.impressions)
-            : "—",
-          delta: bingStats ? "Bing impressions (period)" : undefined,
-          tone: bingStats && bingStats.impressions > 0 ? "positive" : "neutral",
-        },
-        {
-          id: "rankings",
-          label: "Ranking changes",
-          value: "—",
-          tone: "neutral",
-        },
-        {
-          id: "opportunities",
-          label: "Open opportunities",
-          value: String(priorities.length),
-          delta: "From Trends + Search + Bing",
-          tone: priorities.length > 0 ? "positive" : "neutral",
-        },
-        {
-          id: "losing",
-          label: "Pages losing traffic",
-          value: "—",
-          tone: "neutral",
-        },
-      ],
-      priorities,
-      recommendedContent: [],
-      channels: buildChannels(null, priorities),
-      recentWins: buildRecentWins(null, bingStats),
-      connectedIntegrations,
-    };
-  }
-
-  const { recent, prior } = splitDaily(stats);
-  const recentImp = sumMetric(recent, "impressions");
-  const priorImp = sumMetric(prior, "impressions");
-  const impDelta = pctChange(recentImp, priorImp);
-
-  const recentPos = avgPosition(recent);
-  const priorPos = avgPosition(prior);
-  const posDelta =
-    priorPos > 0 && recentPos > 0 ? priorPos - recentPos : null;
-
-  const gscNew = stats.pageOpportunities.filter(
-    (p) => p.impressions >= 10 && p.clicks <= 2
-  ).length;
-  const trendsOpen = trendOpportunities.length;
-
-  const losing = stats.pageOpportunities
-    .filter((p) => p.position > 20 || (p.impressions >= 15 && p.ctr < 0.02))
-    .slice(0, 8).length;
-
-  const weekSummary: WeekSummaryItem[] = [
-    {
-      id: "impressions",
-      label: "Impression change",
-      value: formatPct(impDelta) ?? "—",
-      delta:
-        priorImp > 0
-          ? `${new Intl.NumberFormat("en").format(recentImp)} vs prior half`
-          : undefined,
-      tone:
-        impDelta === null
-          ? "neutral"
-          : impDelta > 2
-            ? "positive"
-            : impDelta < -2
-              ? "negative"
-              : "neutral",
-    },
-    {
-      id: "rankings",
-      label: "Ranking changes",
-      value:
-        posDelta === null
-          ? "—"
-          : `${posDelta > 0 ? "↑" : posDelta < 0 ? "↓" : "→"} ${Math.abs(posDelta).toFixed(1)}`,
-      delta: `Avg position ${stats.position.toFixed(1)}`,
-      tone:
-        posDelta === null
-          ? "neutral"
-          : posDelta > 0.3
-            ? "positive"
-            : posDelta < -0.3
-              ? "negative"
-              : "neutral",
-    },
-    {
-      id: "opportunities",
-      label: "Open opportunities",
-      value: String(priorities.length),
-      delta: `${gscNew} Search Console · ${trendsOpen} Trends`,
-      tone: priorities.length > 0 ? "positive" : "neutral",
-    },
-    {
-      id: "losing",
-      label: "Pages losing traffic",
-      value: String(losing),
-      delta: "Weak CTR or deep rankings",
-      tone: losing > 3 ? "negative" : losing > 0 ? "neutral" : "positive",
-    },
+  const connectedIntegrations = [
+    ...(stats ? ["Google Search Console"] : []),
+    ...(bingStats ? ["Bing Webmaster"] : []),
+    ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
   ];
 
-  const recommendedContent: ContentIdea[] = stats.queryOpportunities
-    .filter((q) => q.impressions >= 5 && q.clicks <= 1)
-    .slice(0, 5)
-    .map((q) => ({
-      id: q.key,
-      title: q.key,
-      reason: `${new Intl.NumberFormat("en").format(q.impressions)} impressions with little click-through — strong topic to cover or refresh.`,
-      impressions: q.impressions,
-    }));
+  const recommendedContent: ContentIdea[] = stats
+    ? stats.queryOpportunities
+        .filter((q) => q.impressions >= 5 && q.clicks <= 1)
+        .slice(0, 5)
+        .map((q) => ({
+          id: q.key,
+          title: q.key,
+          reason: `${new Intl.NumberFormat("en").format(q.impressions)} impressions with little click-through — strong topic to cover or refresh.`,
+          impressions: q.impressions,
+        }))
+    : [];
 
   return {
     opportunityScore: computeOpportunityScore(stats, priorities),
-    weekSummary,
+    seoMetrics: buildSeoMetrics(stats, bingStats, priorities),
     priorities,
     recommendedContent,
-    channels: buildChannels(stats, priorities),
     recentWins: buildRecentWins(stats, bingStats),
-    connectedIntegrations: [
-      "Google Search Console",
-      ...(bingStats ? ["Bing Webmaster"] : []),
-      ...(trendOpportunities.length > 0 ? ["Google Trends"] : []),
-    ],
+    connectedIntegrations,
   };
 }

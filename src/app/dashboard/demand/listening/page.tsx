@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { DemandLayerPage } from "@/components/dashboard/demand-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Social Listening",
-};
-
-export default function DemandListeningRoute() {
-  return <DemandLayerPage defaultTab="social-listening" />;
+export default function Page() {
+  redirect("/dashboard/keyword-opportunities");
 }

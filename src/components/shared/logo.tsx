@@ -8,32 +8,28 @@ export function Logo({
 }: {
   className?: string;
   href?: string;
+  /** When false, shows only the icon portion of the wordmark. */
   showWordmark?: boolean;
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center gap-2.5 text-foreground transition-opacity hover:opacity-90",
+        "inline-flex items-center text-foreground transition-opacity hover:opacity-90",
         className
       )}
     >
-      <span className="relative flex size-8 shrink-0 items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logos/growthmcp.png"
-          alt=""
-          width={32}
-          height={32}
-          className="size-8 object-contain"
-          aria-hidden
-        />
-      </span>
-      {showWordmark && (
-        <span className="text-[15px] font-semibold tracking-tight">
-          GrowthMCP
-        </span>
-      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logos/growseo.png"
+        alt="growseo"
+        width={showWordmark ? 152 : 32}
+        height={32}
+        className={cn(
+          "h-8 shrink-0 object-contain",
+          showWordmark ? "w-auto" : "w-8 object-left object-cover"
+        )}
+      />
     </Link>
   );
 }

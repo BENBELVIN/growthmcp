@@ -5,19 +5,10 @@ const columns = [
   {
     title: "Product",
     links: [
-      { href: "#features", label: "Features" },
-      { href: "#integrations", label: "Integrations" },
-      { href: "/dashboard", label: "Dashboard" },
-      { href: "#developers", label: "MCP Tools" },
-    ],
-  },
-  {
-    title: "Developers",
-    links: [
-      { href: "/docs", label: "Documentation" },
-      { href: "/docs#tools", label: "Tool reference" },
-      { href: "/dashboard/engine/mcp", label: "MCP setup" },
-      { href: "https://modelcontextprotocol.io", label: "About MCP" },
+      { href: "/dashboard", label: "Overview" },
+      { href: "/dashboard/keyword-opportunities", label: "Keyword Opportunities" },
+      { href: "/dashboard/content-rankings", label: "Content & Rankings" },
+      { href: "/dashboard/settings", label: "Settings" },
     ],
   },
   {
@@ -34,12 +25,11 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo />
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-            Developer infrastructure that gives AI agents the growth context to
-            improve your product.
+            AI-powered SEO intelligence for indie hackers and SaaS founders.
           </p>
         </div>
         {columns.map((col) => (
@@ -62,8 +52,8 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} GrowthMCP. All rights reserved.</p>
-          <p>Built for agents that ship growth.</p>
+          <p>© {new Date().getFullYear()} GrowthSEO. All rights reserved.</p>
+          <p>Find opportunities. Improve rankings. Grow traffic.</p>
         </div>
       </div>
     </footer>

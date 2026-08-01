@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { SupplyLayerPage } from "@/components/dashboard/supply-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Social Publishing",
-};
-
-export default function SupplyPublishingRoute() {
-  return <SupplyLayerPage defaultTab="social-publishing" />;
+export default function Page() {
+  redirect("/dashboard/content-rankings");
 }

@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { ConvertLayerPage } from "@/components/dashboard/convert-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "PostHog Analytics",
-};
-
-export default function ConvertAnalyticsRoute() {
-  return <ConvertLayerPage defaultTab="analytics" />;
+export default function Page() {
+  redirect("/dashboard");
 }

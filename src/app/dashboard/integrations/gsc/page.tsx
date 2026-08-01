@@ -1,15 +1,12 @@
 import { redirect } from "next/navigation";
-import { enginePaths } from "@/lib/data/dashboard";
+import { settingsPaths } from "@/lib/data/dashboard";
 
-/** Legacy GSC property picker — moved under engine/integrations. */
-export default async function GscPropertyRedirect({
+export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ websiteId?: string }>;
 }) {
   const params = await searchParams;
-  if (!params.websiteId) {
-    redirect(enginePaths.integrations);
-  }
-  redirect(`${enginePaths.gsc}?websiteId=${params.websiteId}`);
+  const qs = params.websiteId ? `?websiteId=${params.websiteId}` : "";
+  redirect(`${settingsPaths.gsc}${qs}`);
 }

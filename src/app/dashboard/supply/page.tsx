@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { SupplyLayerPage } from "@/components/dashboard/supply-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Supply Layer",
-};
-
-export default function SupplyRoute() {
-  return <SupplyLayerPage />;
+export default function Page() {
+  redirect("/dashboard/content-rankings");
 }

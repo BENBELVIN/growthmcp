@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const fail = (msg: string) =>
     NextResponse.redirect(
       new URL(
-        `/dashboard/engine/integrations?bing_error=${encodeURIComponent(msg)}`,
+        `/dashboard/settings?bing_error=${encodeURIComponent(msg)}`,
         origin
       )
     );
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
             .eq("website_id", payload.websiteId);
 
           const res = NextResponse.redirect(
-            new URL("/dashboard/engine/integrations?bing=connected", origin)
+            new URL("/dashboard/settings?bing=connected", origin)
           );
           res.cookies.delete(BING_OAUTH_STATE_COOKIE);
           return res;
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     const res = NextResponse.redirect(
       new URL(
-        `/dashboard/engine/integrations/bing?websiteId=${payload.websiteId}`,
+        `/dashboard/settings/integrations/bing?websiteId=${payload.websiteId}`,
         origin
       )
     );

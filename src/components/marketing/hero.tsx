@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, TriangleAlert } from "lucide-react";
+import { ArrowRight, Search, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -15,16 +15,12 @@ const sourceLogos = [
     src: "/logos/gsc.svg",
   },
   {
-    name: "Cursor",
-    src: "/logos/cursor.svg",
-  },
-  {
     name: "Google Trends",
     src: "/logos/trends.png",
   },
   {
-    name: "Claude",
-    src: "/logos/claude.svg",
+    name: "Bing Webmaster",
+    src: "/logos/bing.svg",
   },
 ];
 
@@ -66,7 +62,7 @@ export function Hero() {
             transition={{ duration: 0.6, ease }}
             className="text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl lg:leading-[1.05]"
           >
-            The context provider for coding agents
+            AI-powered SEO intelligence for indie hackers
           </motion.h1>
 
           <motion.p
@@ -75,8 +71,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.1, ease }}
             className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
           >
-            Not an SEO tool. GrowthMCP feeds live product signals into Cursor and
-            Claude via MCP—so agents know what to change next, inside your editor.
+            GrowthSEO helps founders grow organic traffic by analysing search
+            demand, website visibility, and SEO opportunities — so you know
+            exactly what to create or improve next.
           </motion.p>
 
           <motion.div
@@ -97,9 +94,22 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-4 pb-24 md:grid-cols-12">
-          {/* Platform agnostic */}
-          <BentoCard delay={0.2} className="p-6 md:col-span-3">
+        <div className="mt-16 grid grid-cols-1 gap-4 pb-24 md:grid-cols-12 md:grid-rows-[auto_auto]">
+          <BentoCard
+            delay={0.2}
+            className="relative min-h-[320px] md:col-span-4 md:row-span-2 md:min-h-0"
+          >
+            <Image
+              src="/hero-feature.png"
+              alt="GrowthSEO glass logo floating over a field of daisies"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover object-center"
+            />
+          </BentoCard>
+
+          <BentoCard delay={0.24} className="p-6 md:col-span-4">
             <div className="flex flex-wrap gap-2">
               {sourceLogos.map((logo) => (
                 <span
@@ -119,98 +129,87 @@ export function Hero() {
               ))}
             </div>
             <h3 className="mt-6 text-xl font-semibold tracking-tight">
-              Built for
+              Connect your
               <br />
-              agents
+              search data
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Plug GrowthMCP into Cursor, Claude, or any MCP client—same context,
-              anywhere you code.
+              Search Console, Bing, and Trends — unified into one SEO command
+              centre.
             </p>
           </BentoCard>
 
-          {/* Feature image */}
-          <BentoCard delay={0.26} className="min-h-[220px] md:col-span-6">
-            <Image
-              src="/iridescent-growth.png"
-              alt="Iridescent growth signals"
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-            />
+          <BentoCard delay={0.28} className="p-6 md:col-span-4">
+            <p className="text-6xl font-semibold tracking-tighter text-foreground">
+              3×
+            </p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Faster from insight to action when you know which keywords and
+              pages to prioritise.
+            </p>
           </BentoCard>
 
-          {/* Stat 1 */}
-          <BentoCard delay={0.32} className="p-6 md:col-span-3">
+          <BentoCard delay={0.32} className="p-6 md:col-span-4">
             <p className="text-6xl font-semibold tracking-tighter text-foreground">
               40%
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Less guessing in chat—agents act on live product context instead of
-              generic SEO advice.
+              Less guesswork — recommendations based on real search demand and
+              ranking data.
             </p>
           </BentoCard>
 
-          {/* Stat 2 */}
-          <BentoCard delay={0.36} className="p-6 md:col-span-3">
-            <p className="text-6xl font-semibold tracking-tighter text-foreground">
-              5×
-            </p>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Faster loops from signal to shipped change when coding agents have
-              the right context.
-            </p>
-          </BentoCard>
-
-          {/* Live context tools */}
-          <BentoCard delay={0.4} className="flex flex-col p-6 md:col-span-3">
+          <BentoCard delay={0.36} className="flex flex-col p-6 md:col-span-4">
             <h3 className="text-xl font-semibold tracking-tight">
-              Live context
+              Live SEO
               <br />
-              for agents
+              signals
             </h3>
             <div className="mt-5 overflow-hidden rounded-xl bg-[#0c0d10] p-3 font-mono text-[11px] leading-relaxed text-white/70 shadow-inner">
-              <p className="text-emerald-400">→ get_search_console()</p>
-              <p className="mt-1 text-white/50">page /pricing</p>
+              <p className="text-emerald-400">→ /pricing ranking at pos 4.2</p>
+              <p className="mt-1 text-white/50">1,240 impressions · 2.1% CTR</p>
               <p className="flex items-center gap-1.5 text-amber-400">
                 <TriangleAlert className="size-3" />
-                CTR -18% at pos 4.2
+                Opportunity: improve title & meta
               </p>
             </div>
           </BentoCard>
 
-          {/* What agents do with it */}
-          <BentoCard delay={0.44} className="p-6 md:col-span-6">
-            <h3 className="text-xl font-semibold tracking-tight">
-              Context in. Changes out.
-            </h3>
-            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-              GrowthMCP ranks the next best actions so your coding agent can open
-              the file, edit the page, and ship—without leaving the IDE.
-            </p>
+          <BentoCard delay={0.4} className="p-6 md:col-span-12">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h3 className="text-xl font-semibold tracking-tight">
+                  Find opportunities. Improve rankings.
+                </h3>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                  GrowthSEO ranks your next best SEO actions — create new pages,
+                  update existing content, and target high-intent keywords.
+                </p>
+              </div>
 
-            <div className="mt-6 flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <Sparkles className="size-4" />
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-border to-transparent" />
-              <div className="hidden gap-2 sm:flex">
-                {["Refresh /pricing", "Ship /ai-growth", "New brief"].map(
-                  (task, i) => (
-                    <span
-                      key={task}
-                      className={cn(
-                        "rounded-full border border-border px-3 py-1.5 text-xs font-medium",
-                        i === 0
-                          ? "bg-brand/10 text-brand"
-                          : "bg-white text-muted-foreground"
-                      )}
-                    >
-                      {task}
-                    </span>
-                  )
-                )}
+              <div className="flex items-center gap-3 md:shrink-0">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Search className="size-4" />
+                </span>
+                <div className="h-px w-8 bg-border md:hidden" />
+                <div className="hidden h-px w-12 bg-gradient-to-r from-border to-transparent md:block" />
+                <div className="flex flex-wrap gap-2">
+                  {["Create /ai-growth", "Refresh /pricing", "Target keyword"].map(
+                    (task, i) => (
+                      <span
+                        key={task}
+                        className={cn(
+                          "rounded-full border border-border px-3 py-1.5 text-xs font-medium",
+                          i === 0
+                            ? "bg-brand/10 text-brand"
+                            : "bg-white text-muted-foreground"
+                        )}
+                      >
+                        {task}
+                      </span>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           </BentoCard>

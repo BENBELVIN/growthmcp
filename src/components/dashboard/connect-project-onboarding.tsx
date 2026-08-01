@@ -19,8 +19,7 @@ export function ConnectProjectOnboarding() {
             Connect your first project
           </h2>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Add a site to analyze. Integrations and growth data attach to this
-            project.
+            Add a site to analyse search demand, rankings, and SEO opportunities.
           </p>
         </div>
 

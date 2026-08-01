@@ -1,8 +1,7 @@
 /**
- * GrowthMCP stdio server for Cursor.
+ * GrowthSEO stdio MCP server for Cursor.
  *
  * Run: npm run mcp
- * Cursor config: see /dashboard/engine/mcp
  *
  * Loads .env.local via @next/env. Requires SUPABASE_SERVICE_ROLE_KEY.
  */
@@ -14,11 +13,9 @@ import { z } from "zod";
 import {
   errorResult,
   jsonResult,
-  mcpGetAppMetrics,
   mcpGetGrowthPriorities,
   mcpGetProjectOverview,
   mcpGetSeoInsights,
-  mcpGetSocialInsights,
   mcpListProjects,
 } from "../lib/mcp/tools";
 
@@ -29,11 +26,11 @@ const websiteIdField = z
   .uuid()
   .optional()
   .describe(
-    "GrowthMCP project (website) id. Defaults to GROWTHMCP_WEBSITE_ID env."
+    "GrowthSEO project (website) id. Defaults to GROWTHMCP_WEBSITE_ID env."
   );
 
 const server = new McpServer({
-  name: "growthmcp",
+  name: "growseo",
   version: "0.1.0",
 });
 
@@ -41,7 +38,7 @@ server.registerTool(
   "list_projects",
   {
     description:
-      "List GrowthMCP projects (websites) available to this workspace connection.",
+      "List GrowthSEO projects (websites) available to this workspace connection.",
   },
   async () => {
     try {
@@ -56,7 +53,7 @@ server.registerTool(
   "get_project_overview",
   {
     description:
-      "Cross-channel project overview: opportunity score, channel cards, connected integrations, top priorities, and recent wins.",
+      "SEO project overview: opportunity score, search metrics, connected integrations, top priorities, and content recommendations.",
     inputSchema: {
       websiteId: websiteIdField,
     },
@@ -74,7 +71,7 @@ server.registerTool(
   "get_growth_priorities",
   {
     description:
-      "SOURCE OF TRUTH for what to implement next. Unified Top growth opportunities queue ranked for Cursor.",
+      "SOURCE OF TRUTH for what to implement next. Unified SEO priority queue ranked by impact.",
     inputSchema: {
       websiteId: websiteIdField,
       limit: z
@@ -99,7 +96,7 @@ server.registerTool(
   "get_seo_insights",
   {
     description:
-      "SEO channel insights: Google Search Console + Bing Webmaster totals/queries/pages plus Trends opportunities.",
+      "SEO insights: Google Search Console + Bing Webmaster totals/queries/pages plus Trends opportunities.",
     inputSchema: {
       websiteId: websiteIdField,
     },
@@ -113,49 +110,13 @@ server.registerTool(
   }
 );
 
-server.registerTool(
-  "get_social_insights",
-  {
-    description:
-      "Social channel insights (TikTok, Instagram, X). Returns connection status until integrations are live.",
-    inputSchema: {
-      websiteId: websiteIdField,
-    },
-  },
-  async ({ websiteId }) => {
-    try {
-      return jsonResult(await mcpGetSocialInsights(websiteId));
-    } catch (e) {
-      return errorResult(e);
-    }
-  }
-);
-
-server.registerTool(
-  "get_app_metrics",
-  {
-    description:
-      "App growth metrics (App Store Connect, RevenueCat, PostHog). Returns connection status until integrations are live.",
-    inputSchema: {
-      websiteId: websiteIdField,
-    },
-  },
-  async ({ websiteId }) => {
-    try {
-      return jsonResult(await mcpGetAppMetrics(websiteId));
-    } catch (e) {
-      return errorResult(e);
-    }
-  }
-);
-
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("GrowthMCP MCP server running on stdio");
+  console.error("GrowthSEO MCP server running on stdio");
 }
 
 main().catch((error) => {
-  console.error("GrowthMCP MCP server failed:", error);
+  console.error("GrowthSEO MCP server failed:", error);
   process.exit(1);
 });

@@ -1,10 +1,5 @@
-import type { Metadata } from "next";
-import { ConvertLayerPage } from "@/components/dashboard/convert-layer-page";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Convert Layer",
-};
-
-export default function ConvertRoute() {
-  return <ConvertLayerPage />;
+export default function Page() {
+  redirect("/dashboard");
 }

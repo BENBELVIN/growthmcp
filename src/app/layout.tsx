@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GrowthMCP — The context provider for coding agents",
-    template: "%s · GrowthMCP",
+    default: "GrowthSEO — AI-powered SEO intelligence for founders",
+    template: "%s · GrowthSEO",
   },
   description:
-    "Not an SEO tool. GrowthMCP feeds live product signals into Cursor and Claude via MCP—so coding agents know what to change next.",
-  metadataBase: new URL("https://growthmcp.dev"),
+    "GrowthSEO helps indie hackers and SaaS founders grow organic traffic by analysing search demand, website visibility, and SEO opportunities.",
+  metadataBase: new URL("https://growseo.app"),
 };
 
 export default function RootLayout({

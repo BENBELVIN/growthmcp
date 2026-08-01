@@ -77,7 +77,7 @@ export async function selectBingProperty(websiteId: string, propertyUri: string)
   }
 
   revalidatePath("/dashboard", "layout");
-  redirect("/dashboard/engine/integrations?bing=connected");
+  redirect("/dashboard/settings?bing=connected");
 }
 
 export async function disconnectBing(websiteId: string) {

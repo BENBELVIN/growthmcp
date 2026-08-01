@@ -73,7 +73,7 @@ export async function selectGscProperty(websiteId: string, propertyUri: string) 
   }
 
   revalidatePath("/dashboard", "layout");
-  redirect("/dashboard/engine/integrations?gsc=connected");
+  redirect("/dashboard/settings?gsc=connected");
 }
 
 export async function disconnectGsc(websiteId: string) {

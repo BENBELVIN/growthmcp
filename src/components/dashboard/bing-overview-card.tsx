@@ -210,7 +210,7 @@ export function BingOverviewCard({ websiteId }: { websiteId: string }) {
           asChild
           className="mt-5 h-10 rounded-full bg-primary px-5 text-primary-foreground"
         >
-          <Link href="/dashboard/engine/integrations">
+          <Link href="/dashboard/settings">
             Connect Bing
             <ArrowUpRight className="size-4" />
           </Link>
@@ -258,7 +258,7 @@ export function BingOverviewCard({ websiteId }: { websiteId: string }) {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {rangePicker}
-          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-emerald-400 ring-1 ring-emerald-500/20">
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-emerald-600 ring-1 ring-emerald-500/20">
             Live
           </span>
         </div>
@@ -334,20 +334,20 @@ export function BingOverviewCard({ websiteId }: { websiteId: string }) {
                 </linearGradient>
               </defs>
               <CartesianGrid
-                stroke="rgba(255,255,255,0.06)"
+                stroke="rgba(0,0,0,0.06)"
                 vertical={false}
               />
               <XAxis
                 dataKey="date"
                 tickFormatter={formatDay}
-                tick={{ fill: "oklch(0.68 0.01 260)", fontSize: 11 }}
+                tick={{ fill: "oklch(0.5 0.02 250)", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 minTickGap={28}
               />
               <YAxis
                 yAxisId="left"
-                tick={{ fill: "oklch(0.68 0.01 260)", fontSize: 11 }}
+                tick={{ fill: "oklch(0.5 0.02 250)", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 width={36}
@@ -355,7 +355,7 @@ export function BingOverviewCard({ websiteId }: { websiteId: string }) {
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                tick={{ fill: "oklch(0.68 0.01 260)", fontSize: 11 }}
+                tick={{ fill: "oklch(0.5 0.02 250)", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 width={40}

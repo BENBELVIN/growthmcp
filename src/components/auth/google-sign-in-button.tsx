@@ -35,7 +35,7 @@ export function GoogleSignInButton({ next = "/dashboard" }: { next?: string }) {
       type="button"
       disabled={pending}
       onClick={() => startTransition(() => signInWithGoogle(next))}
-      className="h-12 w-full rounded-xl border border-white/10 bg-white text-[15px] font-medium text-neutral-900 shadow-sm hover:bg-white/90 disabled:opacity-70"
+      className="h-12 w-full rounded-xl border border-border bg-white text-[15px] font-medium text-neutral-900 shadow-sm hover:bg-neutral-50 disabled:opacity-70"
     >
       <GoogleIcon className="size-5" />
       {pending ? "Redirecting…" : "Continue with Google"}
