@@ -39,6 +39,6 @@ export const mcpTools = [
   },
   {
     name: "list_projects",
-    description: "List GrowthMCP projects available to this connection.",
+    description: "List growseo projects available to this connection.",
   },
 ] as const;

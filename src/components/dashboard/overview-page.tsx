@@ -213,7 +213,7 @@ export function OverviewPage() {
               Connect Search Console to get started
             </h3>
             <p className="mt-2 max-w-lg text-sm text-muted-foreground">
-              GrowthSEO analyses your search visibility and keyword demand to show
+              growseo analyses your search visibility and keyword demand to show
               exactly what to create or improve next.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

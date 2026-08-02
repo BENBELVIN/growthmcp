@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   fetchGscOverview,
   getValidAccessToken as getGscAccessToken,
+  type GscOverviewStats,
 } from "@/lib/gsc/client";
 import {
   fetchBingOverview,
@@ -16,7 +17,6 @@ import { getGscConnectionSecret } from "@/lib/gsc/queries";
 import { getBingConnectionSecret } from "@/lib/bing/queries";
 import { listTrendOpportunities } from "@/lib/trends/repository";
 import { buildUnifiedPriorities } from "@/lib/growth/priorities";
-import type { GscOverviewStats } from "@/lib/gsc/client";
 
 async function requireUser() {
   const supabase = await createClient();

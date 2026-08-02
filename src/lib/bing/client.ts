@@ -214,7 +214,7 @@ function rankDimRows(
     .slice(0, opts.limit);
 }
 
-type SupabaseLike = {
+export type SupabaseLike = {
   from: (table: string) => {
     update: (values: Record<string, unknown>) => {
       eq: (
@@ -226,7 +226,7 @@ type SupabaseLike = {
 };
 
 export async function getValidAccessToken(
-  supabase: SupabaseLike,
+  supabase: unknown,
   connection: {
     id: string;
     access_token: string;
@@ -234,6 +234,7 @@ export async function getValidAccessToken(
     token_expires_at: string;
   }
 ) {
+  const db = supabase as SupabaseLike;
   const expiresAt = new Date(connection.token_expires_at).getTime();
   const needsRefresh = expiresAt - Date.now() < 60_000;
 
@@ -247,7 +248,7 @@ export async function getValidAccessToken(
   ).toISOString();
 
   // Bing may rotate refresh tokens — always persist a new one when returned.
-  await supabase
+  await db
     .from("bing_connections")
     .update({
       access_token: tokens.access_token,

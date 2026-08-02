@@ -131,7 +131,7 @@ export async function getTrendsInsightsForWebsite(
 
     let opportunities: TrendOpportunity[] = [];
 
-    // Always regenerate GrowthMCP opportunities from cached Trends + live GSC
+    // Always regenerate growseo opportunities from cached Trends + live GSC
     // so copy/logic improvements apply without waiting for a live Trends crawl.
     if (trends.length > 0) {
       const website = await supabase

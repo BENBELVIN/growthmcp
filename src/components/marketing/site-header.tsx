@@ -1,25 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "#product", label: "Product" },
-  { href: "#solutions", label: "Solutions", hasChevron: true },
-  { href: "#developers", label: "Developers" },
-  { href: "#enterprise", label: "Enterprise" },
-  { href: "#support", label: "Support" },
+  { href: "/#product", label: "Product" },
+  { href: "/blog", label: "Blog" },
 ];
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-transparent">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-200",
+        scrolled
+          ? "border-b border-border bg-background shadow-sm"
+          : "border-b border-transparent bg-transparent"
+      )}
+    >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
         <Logo />
 
@@ -28,10 +40,9 @@ export function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="inline-flex items-center gap-1 text-[15px] font-medium text-foreground/80 transition-colors hover:text-foreground"
+              className="text-[15px] font-medium text-foreground/80 transition-colors hover:text-foreground"
             >
               {link.label}
-              {link.hasChevron && <ChevronDown className="size-4 opacity-60" />}
             </Link>
           ))}
         </nav>

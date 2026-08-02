@@ -11,7 +11,7 @@ export function AddProjectDialog() {
     <Dialog open={addProjectOpen} onOpenChange={setAddProjectOpen}>
       <DialogHeader
         title="Add Project"
-        description="Projects are the sites GrowthSEO analyses. Connect Search Console and Trends per project."
+        description="Projects are the sites growseo analyses. Connect Search Console and Trends per project."
         onClose={() => setAddProjectOpen(false)}
       />
       <DialogBody>

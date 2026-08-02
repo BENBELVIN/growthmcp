@@ -1,4 +1,4 @@
--- GrowthMCP auth foundation: profiles, workspaces, members, RLS, signup trigger
+-- growseo auth foundation: profiles, workspaces, members, RLS, signup trigger
 
 -- ---------------------------------------------------------------------------
 -- Tables

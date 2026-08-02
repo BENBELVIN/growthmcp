@@ -79,13 +79,13 @@ export const howItWorks = [
     step: 1,
     title: "Connect your data",
     description:
-      "Link Search Console, analytics, Trends, and social accounts in minutes. GrowthMCP normalizes everything into agent-ready context.",
+      "Link Search Console, Bing, and Trends in minutes. growseo turns search data into clear SEO actions.",
   },
   {
     step: 2,
-    title: "GrowthMCP analyses everything",
+    title: "growseo analyses your search data",
     description:
-      "We score opportunities across search, content, and distribution—then package them as structured MCP tool responses.",
+      "We score keyword and ranking opportunities, then show you what to create, update, or target next.",
   },
   {
     step: 3,

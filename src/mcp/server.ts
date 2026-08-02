@@ -1,5 +1,5 @@
 /**
- * GrowthSEO stdio MCP server for Cursor.
+ * growseo stdio MCP server for Cursor.
  *
  * Run: npm run mcp
  *
@@ -26,7 +26,7 @@ const websiteIdField = z
   .uuid()
   .optional()
   .describe(
-    "GrowthSEO project (website) id. Defaults to GROWTHMCP_WEBSITE_ID env."
+    "growseo project (website) id. Defaults to GROWSEO_WEBSITE_ID env."
   );
 
 const server = new McpServer({
@@ -38,7 +38,7 @@ server.registerTool(
   "list_projects",
   {
     description:
-      "List GrowthSEO projects (websites) available to this workspace connection.",
+      "List growseo projects (websites) available to this workspace connection.",
   },
   async () => {
     try {
@@ -113,10 +113,10 @@ server.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("GrowthSEO MCP server running on stdio");
+  console.error("growseo MCP server running on stdio");
 }
 
 main().catch((error) => {
-  console.error("GrowthSEO MCP server failed:", error);
+  console.error("growseo MCP server failed:", error);
   process.exit(1);
 });

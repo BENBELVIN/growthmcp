@@ -1,6 +1,6 @@
 /**
  * MCP tool handlers — no Next.js cookies / redirects.
- * Uses the service-role Supabase client so Cursor can call GrowthMCP locally.
+ * Uses the service-role Supabase client so Cursor can call growseo locally.
  */
 
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -22,7 +22,12 @@ import type { Website } from "@/types/database";
 type Admin = ReturnType<typeof createAdminClient>;
 
 function resolveWebsiteId(explicit?: string) {
-  return explicit?.trim() || process.env.GROWTHMCP_WEBSITE_ID?.trim() || null;
+  return (
+    explicit?.trim() ||
+    process.env.GROWSEO_WEBSITE_ID?.trim() ||
+    process.env.GROWTHMCP_WEBSITE_ID?.trim() ||
+    null
+  );
 }
 
 async function getWebsite(admin: Admin, websiteId: string): Promise<Website> {
@@ -117,7 +122,7 @@ export async function mcpGetGrowthPriorities(websiteId?: string, limit = 15) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -147,7 +152,7 @@ export async function mcpGetProjectContext(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -187,7 +192,7 @@ export async function mcpGetSeoInsights(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -209,7 +214,7 @@ export async function mcpGetSearchConsole(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -247,7 +252,7 @@ export async function mcpGetBingWebmaster(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -285,7 +290,7 @@ export async function mcpGetTrendOpportunities(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 
@@ -306,7 +311,7 @@ export async function mcpGetRecommendedContent(websiteId?: string) {
   const id = resolveWebsiteId(websiteId);
   if (!id) {
     throw new Error(
-      "websiteId is required (or set GROWTHMCP_WEBSITE_ID in the MCP server env)."
+      "websiteId is required (or set GROWSEO_WEBSITE_ID in the MCP server env)."
     );
   }
 

@@ -1,5 +1,5 @@
 /**
- * Public Google Trends service API for GrowthMCP.
+ * Public Google Trends service API for growseo.
  * App code should import from here (or the package index) — never from client.ts.
  */
 

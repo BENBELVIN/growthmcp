@@ -1,5 +1,5 @@
 /**
- * GrowthMCP unified priority queue.
+ * growseo unified priority queue.
  * Source of truth for Overview "Top priorities" and (later) MCP → Cursor.
  * Merges Search Console page opportunities + Trends keyword opportunities.
  */

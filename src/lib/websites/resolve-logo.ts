@@ -57,7 +57,7 @@ async function fetchWithTimeout(url: string, ms = 4000) {
       redirect: "follow",
       headers: {
         Accept: "text/html,application/xhtml+xml",
-        "User-Agent": "GrowthMCP/1.0 (+https://growthmcp.app)",
+        "User-Agent": "growseo/1.0 (+https://growseo.app)",
       },
     });
   } finally {

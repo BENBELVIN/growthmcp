@@ -1,6 +1,6 @@
 /**
- * Trends sync orchestration for a GrowthMCP project (website).
- * GrowthMCP remains source of truth — Trends only enriches opportunity signals.
+ * Trends sync orchestration for a growseo project (website).
+ * growseo is source of truth; Trends is an enrichment provider.
  */
 
 import { getKeywordTrendsBundle } from "./service";
@@ -98,7 +98,7 @@ function gscBestMatch(seeds: GscQuerySeed[], keyword: string) {
 }
 
 /**
- * Turn Trends + GSC into GrowthMCP opportunities.
+ * Turn Trends + GSC into growseo opportunities.
  * Trends enriches; Search Console fills gaps when Trends coverage is thin.
  */
 export function generateTrendOpportunities(

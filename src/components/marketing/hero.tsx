@@ -62,7 +62,7 @@ export function Hero() {
             transition={{ duration: 0.6, ease }}
             className="text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl lg:leading-[1.05]"
           >
-            AI-powered SEO intelligence for indie hackers
+            Grow your product with organic traffic.
           </motion.h1>
 
           <motion.p
@@ -71,9 +71,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.1, ease }}
             className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg"
           >
-            GrowthSEO helps founders grow organic traffic by analysing search
-            demand, website visibility, and SEO opportunities — so you know
-            exactly what to create or improve next.
+            growseo shows you exactly what people are searching for, which pages
+            to create, and what to improve, so you can get more visitors
+            without wasting months guessing.
           </motion.p>
 
           <motion.div
@@ -94,14 +94,23 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-4 pb-24 md:grid-cols-12 md:grid-rows-[auto_auto]">
+        <div id="product" className="mt-16 scroll-mt-24 pb-24">
+          <div className="mb-8 text-center">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+              Product
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+              See what growseo helps you do
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-12 md:grid-rows-[auto_auto]">
           <BentoCard
             delay={0.2}
             className="relative min-h-[320px] md:col-span-4 md:row-span-2 md:min-h-0"
           >
             <Image
               src="/hero-feature.png"
-              alt="GrowthSEO glass logo floating over a field of daisies"
+              alt="growseo glass logo floating over a field of daisies"
               fill
               priority
               sizes="(max-width: 768px) 100vw, 33vw"
@@ -134,8 +143,7 @@ export function Hero() {
               search data
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Search Console, Bing, and Trends — unified into one SEO command
-              centre.
+              Search Console, Bing, and Trends in one SEO command centre.
             </p>
           </BentoCard>
 
@@ -154,7 +162,7 @@ export function Hero() {
               40%
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Less guesswork — recommendations based on real search demand and
+              Less guesswork. Recommendations based on real search demand and
               ranking data.
             </p>
           </BentoCard>
@@ -182,7 +190,7 @@ export function Hero() {
                   Find opportunities. Improve rankings.
                 </h3>
                 <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  GrowthSEO ranks your next best SEO actions — create new pages,
+                  growseo ranks your next best SEO actions: create new pages,
                   update existing content, and target high-intent keywords.
                 </p>
               </div>
@@ -213,6 +221,7 @@ export function Hero() {
               </div>
             </div>
           </BentoCard>
+          </div>
         </div>
       </div>
     </section>

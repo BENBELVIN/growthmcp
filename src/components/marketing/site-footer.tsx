@@ -1,23 +1,20 @@
 import Link from "next/link";
-import { Logo } from "@/components/shared/logo";
 
 const columns = [
   {
     title: "Product",
     links: [
-      { href: "/dashboard", label: "Overview" },
-      { href: "/dashboard/keyword-opportunities", label: "Keyword Opportunities" },
-      { href: "/dashboard/content-rankings", label: "Content & Rankings" },
-      { href: "/dashboard/settings", label: "Settings" },
+      { href: "/#product", label: "How it works" },
+      { href: "/dashboard", label: "Dashboard" },
+      { href: "/login", label: "Get Early Access" },
     ],
   },
   {
-    title: "Company",
+    title: "Resources",
     links: [
-      { href: "#", label: "Changelog" },
-      { href: "#", label: "Security" },
-      { href: "#", label: "Status" },
-      { href: "#", label: "Contact" },
+      { href: "/blog", label: "Blog" },
+      { href: "/blog/find-keywords-for-your-saas", label: "Keyword research" },
+      { href: "/blog/pages-stuck-on-page-two", label: "Page 2 rankings" },
     ],
   },
 ];
@@ -27,9 +24,18 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="space-y-4">
-          <Logo />
+          <Link href="/" className="inline-block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logos/growseo.png"
+              alt="growseo"
+              width={152}
+              height={32}
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-            AI-powered SEO intelligence for indie hackers and SaaS founders.
+            Grow your product with organic traffic.
           </p>
         </div>
         {columns.map((col) => (
@@ -52,7 +58,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} GrowthSEO. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} growseo. All rights reserved.</p>
           <p>Find opportunities. Improve rankings. Grow traffic.</p>
         </div>
       </div>

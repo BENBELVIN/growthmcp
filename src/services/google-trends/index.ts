@@ -1,5 +1,5 @@
 /**
- * Isolated Google Trends provider for GrowthMCP.
+ * Isolated Google Trends provider for growseo.
  *
  * Swap boundary: replace `client.ts` (and parsers if needed) when Google
  * publishes an official Trends API. Keep `service.ts` / `sync.ts` signatures stable.

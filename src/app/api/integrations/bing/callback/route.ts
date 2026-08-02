@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const tokens = await exchangeCodeForTokens(code, redirectUri);
     if (!tokens.refresh_token) {
       return fail(
-        "No refresh token returned from Bing. Re-authorize GrowthMCP in Bing Webmaster API Access."
+        "No refresh token returned from Bing. Re-authorize growseo in Bing Webmaster API Access."
       );
     }
 

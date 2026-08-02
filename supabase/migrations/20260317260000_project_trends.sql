@@ -1,5 +1,5 @@
--- Google Trends cache + opportunities for GrowthMCP projects (websites).
--- GrowthMCP is source of truth; Trends is an enrichment provider.
+-- Google Trends cache + opportunities for growseo projects (websites).
+-- growseo is source of truth; Trends is an enrichment provider.
 
 create table public.project_trends (
   id uuid primary key default gen_random_uuid(),

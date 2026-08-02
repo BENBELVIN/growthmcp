@@ -5,7 +5,7 @@ import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to GrowthSEO with Google.",
+  description: "Sign in to growseo with Google.",
 };
 
 const errorMessages: Record<string, string> = {

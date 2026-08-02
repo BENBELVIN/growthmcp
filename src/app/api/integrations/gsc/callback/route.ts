@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     const tokens = await exchangeCodeForTokens(code, redirectUri);
     if (!tokens.refresh_token) {
       return fail(
-        "No refresh token returned. Revoke GrowthMCP access in Google Account permissions and try again."
+        "No refresh token returned. Revoke growseo access in Google Account permissions and try again."
       );
     }
 
