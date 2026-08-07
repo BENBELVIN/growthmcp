@@ -129,6 +129,23 @@ export type TrendOpportunity = {
   created_at: string;
 };
 
+export type WaitlistStatus = "pending" | "invited" | "converted" | "unsubscribed";
+
+export type WaitlistSignup = {
+  id: string;
+  email: string;
+  position: number;
+  source: string;
+  referral_code: string;
+  referred_by: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  status: WaitlistStatus;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -338,6 +355,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      waitlist_signups: {
+        Row: WaitlistSignup;
+        Insert: {
+          id?: string;
+          email: string;
+          source?: string;
+          referral_code?: string;
+          referred_by?: string | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          status?: WaitlistStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          source?: string;
+          referral_code?: string;
+          referred_by?: string | null;
+          utm_source?: string | null;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          status?: WaitlistStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -352,6 +399,10 @@ export type Database = {
       bootstrap_user_account: {
         Args: Record<string, never>;
         Returns: Workspace;
+      };
+      waitlist_signup_count: {
+        Args: Record<string, never>;
+        Returns: number;
       };
     };
     Enums: Record<string, never>;

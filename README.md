@@ -33,3 +33,18 @@ Open [http://localhost:3000](http://localhost:3000) for the landing page, [http:
 ## Environment
 
 Set `NEXT_PUBLIC_SITE_URL=https://growseo.app` in production for canonical URLs, sitemap, and Open Graph.
+
+### Waitlist (Resend)
+
+| Variable | Description |
+|----------|-------------|
+| `RESEND_API_KEY` | API key from [Resend](https://resend.com) |
+| `RESEND_FROM_EMAIL` | Verified sender, e.g. `growseo <hello@growseo.app>` |
+
+Signups are stored in Supabase (`waitlist_signups`). Run migrations after pulling:
+
+```bash
+supabase db push
+```
+
+Without `RESEND_API_KEY`, signups still save but no confirmation email is sent (dev-friendly).

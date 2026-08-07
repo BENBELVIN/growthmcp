@@ -1,5 +1,5 @@
 function googleFaviconUrl(hostname: string) {
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`;
+  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=256`;
 }
 
 /** Client-safe fallback when logo_url is missing. */

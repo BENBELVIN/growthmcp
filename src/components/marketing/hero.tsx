@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Search, TriangleAlert } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, TriangleAlert } from "lucide-react";
+import { WaitlistForm } from "@/components/marketing/waitlist-form";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -48,7 +47,13 @@ function BentoCard({
   );
 }
 
-export function Hero() {
+export function Hero({
+  waitlistCount = 0,
+  referralCode,
+}: {
+  waitlistCount?: number;
+  referralCode?: string;
+}) {
   return (
     <section className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(20,160,140,0.14),transparent_70%)]" />
@@ -80,17 +85,12 @@ export function Hero() {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.16, ease }}
-            className="mt-9 flex justify-center"
+            className="mt-9"
           >
-            <Button
-              className="h-12 rounded-full bg-primary px-7 text-[15px] font-medium text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90"
-              asChild
-            >
-              <Link href="/login">
-                Get Early Access
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
+            <WaitlistForm
+              waitlistCount={waitlistCount}
+              referralCode={referralCode}
+            />
           </motion.div>
         </div>
 

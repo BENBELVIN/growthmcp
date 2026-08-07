@@ -40,7 +40,7 @@ async function loadGscStats(
     return null;
   }
   const accessToken = await getGscAccessToken(supabase, connection);
-  return fetchGscOverview(accessToken, connection.property_uri, "28d");
+  return fetchGscOverview(accessToken, connection.property_uri, "3m");
 }
 
 async function loadBingStats(
@@ -56,7 +56,7 @@ async function loadBingStats(
     return null;
   }
   const accessToken = await getBingAccessToken(supabase, connection);
-  return fetchBingOverview(accessToken, connection.property_uri, "28d");
+  return fetchBingOverview(accessToken, connection.property_uri, "3m");
 }
 
 /**

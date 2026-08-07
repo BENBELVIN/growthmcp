@@ -40,6 +40,8 @@ export type RecentWin = {
 
 export type CommandCenterData = {
   opportunityScore: OpportunityScore;
+  totalImpressions: number | null;
+  impressionsDeltaPct: number | null;
   seoMetrics: SeoMetric[];
   priorities: PriorityCard[];
   recommendedContent: ContentIdea[];
@@ -334,8 +336,19 @@ export function buildCommandCenter(
         }))
     : [];
 
+  const { recent, prior } = stats
+    ? splitDaily(stats)
+    : { recent: [], prior: [] as GscOverviewStats["daily"] };
+  const impressionsDeltaPct = stats
+    ? pctChange(sumMetric(recent, "impressions"), sumMetric(prior, "impressions"))
+    : null;
+  const totalImpressions =
+    stats?.impressions ?? (bingStats ? bingStats.impressions : null);
+
   return {
     opportunityScore: computeOpportunityScore(stats, priorities),
+    totalImpressions,
+    impressionsDeltaPct,
     seoMetrics: buildSeoMetrics(stats, bingStats, priorities),
     priorities,
     recommendedContent,

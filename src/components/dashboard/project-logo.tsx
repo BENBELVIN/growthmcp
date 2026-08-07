@@ -5,24 +5,27 @@ import { Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fallbackProjectLogo } from "@/lib/websites/logo-fallback";
 
+/** iOS-style squircle — keep in static strings so Tailwind picks it up. */
+const squircle = "rounded-[22%]";
+
 const sizeStyles = {
   sm: {
-    tile: "size-5 rounded-[22%]",
+    tile: "size-5",
     icon: "size-3",
     px: 20,
   },
   md: {
-    tile: "size-8 rounded-[22%]",
+    tile: "size-8",
     icon: "size-4",
     px: 32,
   },
   lg: {
-    tile: "size-16 rounded-[22%] sm:size-20",
+    tile: "size-16 sm:size-20",
     icon: "size-8",
     px: 80,
   },
   xl: {
-    tile: "size-24 rounded-[22%] sm:size-28",
+    tile: "size-24 sm:size-28",
     icon: "size-10",
     px: 112,
   },
@@ -48,7 +51,8 @@ export function ProjectLogo({
   return (
     <span
       className={cn(
-        "relative flex shrink-0 items-center justify-center overflow-hidden",
+        "relative flex shrink-0 items-center justify-center overflow-hidden bg-muted/30 shadow-sm ring-1 ring-border",
+        squircle,
         s.tile,
         className
       )}
@@ -64,7 +68,8 @@ export function ProjectLogo({
           alt=""
           width={s.px}
           height={s.px}
-          className="size-full object-cover"
+          referrerPolicy="no-referrer"
+          className={cn("size-full object-cover", squircle)}
           onError={() => setFailed(true)}
         />
       )}

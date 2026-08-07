@@ -24,7 +24,9 @@ export function UserMenu() {
     (user.user_metadata?.name as string | undefined) ??
     user.email ??
     "Account";
-  const avatar = user.user_metadata?.avatar_url as string | undefined;
+  const avatar =
+    (user.user_metadata?.avatar_url as string | undefined) ??
+    (user.user_metadata?.picture as string | undefined);
   const initials = name
     .split(" ")
     .map((part) => part[0])
