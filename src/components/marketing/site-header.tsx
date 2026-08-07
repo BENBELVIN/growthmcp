@@ -59,7 +59,7 @@ export function SiteHeader() {
             className="h-10 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             asChild
           >
-            <Link href="/login">Get Early Access</Link>
+            <Link href="/#waitlist">Get Early Access</Link>
           </Button>
         </div>
 
@@ -94,7 +94,9 @@ export function SiteHeader() {
             className="mt-2 h-10 rounded-full bg-primary text-primary-foreground"
             asChild
           >
-            <Link href="/login">Get Early Access</Link>
+            <Link href="/#waitlist" onClick={() => setOpen(false)}>
+              Get Early Access
+            </Link>
           </Button>
         </div>
       </div>

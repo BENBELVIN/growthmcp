@@ -73,7 +73,14 @@ export async function joinWaitlist(
   }
 
   const email = parsed.data.email.toLowerCase();
-  const admin = createAdminClient();
+
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch (error) {
+    console.error("[waitlist] admin client:", error);
+    return { ok: false, error: "Something went wrong. Please try again." };
+  }
 
   const { data: existing, error: existingError } = await admin
     .from("waitlist_signups")

@@ -79,7 +79,7 @@ export function buildWaitlistConfirmationEmail({
                 <strong>What you signed up for</strong>
               </p>
               <p style="margin:0 0 20px;font-size:15px;line-height:1.65;color:${colors.muted};">
-                ${siteConfig.description}
+                ${siteConfig.waitlistBlurb}
               </p>
               <p style="margin:0 0 10px;font-size:15px;line-height:1.5;color:${colors.foreground};">
                 <strong>What happens next</strong>

@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+/** Show public waitlist count only once it reads as credible social proof. */
+const WAITLIST_COUNT_MIN = 25;
+
 type WaitlistFormProps = {
   waitlistCount?: number;
   referralCode?: string;
@@ -107,7 +110,7 @@ export function WaitlistForm({
 
       <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
         No spam. Just your invite when early access opens.
-        {waitlistCount > 0 && (
+        {waitlistCount >= WAITLIST_COUNT_MIN && (
           <>
             {" "}
             <span className="text-foreground/70">

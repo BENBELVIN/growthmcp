@@ -82,10 +82,11 @@ export function Hero({
           </motion.p>
 
           <motion.div
+            id="waitlist"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.16, ease }}
-            className="mt-9"
+            className="mt-9 scroll-mt-28"
           >
             <WaitlistForm
               waitlistCount={waitlistCount}
