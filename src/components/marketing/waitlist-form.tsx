@@ -20,10 +20,7 @@ export function WaitlistForm({
 }: WaitlistFormProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{
-    position: number;
-    isNew: boolean;
-  } | null>(null);
+  const [success, setSuccess] = useState<{ isNew: boolean } | null>(null);
   const [pending, startTransition] = useTransition();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -43,7 +40,6 @@ export function WaitlistForm({
       }
 
       setSuccess({
-        position: result.position,
         isNew: result.isNew,
       });
     });
@@ -59,11 +55,7 @@ export function WaitlistForm({
           {success.isNew ? "You're on the list" : "You're already on the list"}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          You&apos;re{" "}
-          <span className="font-semibold tabular-nums text-foreground">
-            #{success.position.toLocaleString()}
-          </span>{" "}
-          in line. Check your inbox — we sent a confirmation with next steps.
+          Check your inbox — we sent a confirmation with next steps.
         </p>
       </div>
     );
@@ -114,7 +106,7 @@ export function WaitlistForm({
       )}
 
       <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
-        No spam. Just your invite when we open the next batch.
+        No spam. Just your invite when early access opens.
         {waitlistCount > 0 && (
           <>
             {" "}

@@ -20,7 +20,6 @@ const joinWaitlistSchema = z.object({
 export type JoinWaitlistResult =
   | {
       ok: true;
-      position: number;
       isNew: boolean;
     }
   | {
@@ -41,12 +40,7 @@ async function resolveReferrerId(referralCode?: string) {
   return data?.id ?? null;
 }
 
-async function sendConfirmationEmail(
-  email: string,
-  position: number,
-  referralCode: string,
-  isNew: boolean
-) {
+async function sendConfirmationEmail(email: string, isNew: boolean) {
   const resend = getResendClient();
   if (!resend) {
     console.warn(
@@ -58,13 +52,8 @@ async function sendConfirmationEmail(
   const { error } = await resend.emails.send({
     from: getFromEmail(),
     to: email,
-    subject: waitlistConfirmationSubject(position),
-    html: buildWaitlistConfirmationEmail({
-      email,
-      position,
-      referralCode,
-      isNew,
-    }),
+    subject: waitlistConfirmationSubject(),
+    html: buildWaitlistConfirmationEmail({ isNew }),
   });
 
   if (error) {
@@ -98,16 +87,10 @@ export async function joinWaitlist(
   }
 
   if (existing) {
-    await sendConfirmationEmail(
-      existing.email,
-      existing.position,
-      existing.referral_code,
-      false
-    );
+    await sendConfirmationEmail(existing.email, false);
 
     return {
       ok: true,
-      position: existing.position,
       isNew: false,
     };
   }
@@ -136,15 +119,9 @@ export async function joinWaitlist(
         .single();
 
       if (retry) {
-        await sendConfirmationEmail(
-          retry.email,
-          retry.position,
-          retry.referral_code,
-          false
-        );
+        await sendConfirmationEmail(retry.email, false);
         return {
           ok: true,
-          position: retry.position,
           isNew: false,
         };
       }
@@ -154,16 +131,10 @@ export async function joinWaitlist(
     return { ok: false, error: "Something went wrong. Please try again." };
   }
 
-  await sendConfirmationEmail(
-    data.email,
-    data.position,
-    data.referral_code,
-    true
-  );
+  await sendConfirmationEmail(data.email, true);
 
   return {
     ok: true,
-    position: data.position,
     isNew: true,
   };
 }
